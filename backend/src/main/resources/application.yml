@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: backend
+  config:
+    import: optional:file:.env[.properties]
+  profiles:
+    active: prob
+---
+spring:
+  config:
+    activate:
+      on-profile: prob
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    properties:
+      hibernate:
+        format_sql: true
+  swagger:
+    ui:
+      enabled: true
+      path: /swagger-ui.html
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  expiration-ms: ${JWT_EXPIRATION_MS:28800000} # 8 horas
+
+admin:
+  username: ${ADMIN_USERNAME:jefa}
+  password: ${ADMIN_PASSWORD:jefa1234}
