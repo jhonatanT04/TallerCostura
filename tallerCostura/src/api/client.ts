@@ -1,4 +1,4 @@
-const API_URL = 'https://taller-costura-five.vercel.app/api'
+const API_URL = 'https://tallercostura.onrender.com/api'
 
 const AUTH_STORAGE_KEY = 'auth'
 
