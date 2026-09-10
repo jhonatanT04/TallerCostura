@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { crearEmpleado, getEmpleados, getRegistrosDeEmpleado, getTodosLosRegistros } from '../../api'
 import type { Empleado, RegistroDTO } from '../../api/types'
 import { RegistrosTable } from '../../components/RegistrosTable'
+import { Sidebarpage } from './Sidebarpage'
 
 export function AdminPage() {
   const [empleados, setEmpleados] = useState<Empleado[]>([])
@@ -91,6 +92,7 @@ export function AdminPage() {
 
   return (
     <div className="page admin-page">
+      <Sidebarpage/>
       <aside className="panel">
         <div className="panel-header">
           <h2>Empleados</h2>

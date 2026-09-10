@@ -187,6 +187,28 @@ label {
   }
 }
 
+.div-sidebar .sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sidebar .item-sidebar {
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.item-sidebar a {
+  text-decoration: none;
+  color: var(--text-h);
+}
+
+.item-sidebar:hover {
+  /* transform: translateX(5px); */
+  border: var(--accent-border);
+  transition: all 0.2s;
+  background-color: var(--accent-bg);
+}
+
+
 .panel {
   border: 1px solid var(--border);
   border-radius: 12px;
