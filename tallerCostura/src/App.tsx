@@ -6,6 +6,8 @@ import { Navbar } from './components/Navbar'
 import { AdminPage } from './pages/admin/AdminPage'
 import { EmpleadoPage } from './pages/EmpleadoPage'
 import { LoginPage } from './pages/LoginPage'
+import { EmpleadosPage } from './pages/admin/EmpleadosPage'
+import { DashboardPage } from './pages/admin/DashboardPage'
 
 function HomeRedirect() {
   const { user } = useAuth()
@@ -41,7 +43,11 @@ function AppRoutes() {
             <AdminPage />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="empleados" element={<EmpleadosPage />} />
+      </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
