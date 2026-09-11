@@ -31,8 +31,10 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
 
   const res = await fetch(`${API_URL}${path}`, { ...options, headers })
   if (res.status === 401) {
-    localStorage.removeItem('token')
-    window.location.href = '/login'
+    localStorage.removeItem(AUTH_STORAGE_KEY)
+    if (path !== '/auth/login') {
+      window.location.assign('/login')
+    }
     throw new Error('Sesión expirada')
   }
   if (!res.ok) {
