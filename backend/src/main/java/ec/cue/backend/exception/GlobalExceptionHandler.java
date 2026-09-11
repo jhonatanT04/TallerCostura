@@ -14,6 +14,16 @@ import org.springframework.web.server.ResponseStatusException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+	@ExceptionHandler(UsuarioNoEncontradoException.class)
+	public ResponseEntity<Map<String, String>> handleUsuarioNoEncontrado(UsuarioNoEncontradoException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
+	}
+
+	@ExceptionHandler(TokenExpiradoException.class)
+	public ResponseEntity<Map<String, String>> handleTokenExpirado(TokenExpiradoException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", ex.getMessage()));
+	}
+
 	@ExceptionHandler(AuthenticationException.class)
 	public ResponseEntity<Map<String, String>> handleAuthentication(AuthenticationException ex) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Credenciales inválidas"));

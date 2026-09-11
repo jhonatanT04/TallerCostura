@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import ec.cue.backend.dto.LoginRequest;
 import ec.cue.backend.dto.LoginResponse;
+import ec.cue.backend.exception.UsuarioNoEncontradoException;
 import ec.cue.backend.model.Usuario;
 import ec.cue.backend.repository.UsuarioRepository;
 import ec.cue.backend.security.JwtService;
@@ -21,6 +22,9 @@ public class AuthService {
 	private final JwtService jwtService;
 
 	public LoginResponse login(LoginRequest request) {
+		usuarioRepository.findByUsername(request.username())
+				.orElseThrow(() -> new UsuarioNoEncontradoException(request.username()));
+
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
