@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { crearEmpleado, getEmpleados, getRegistrosDeEmpleado, getTodosLosRegistros } from '../../api'
 import type { Empleado, RegistroDTO } from '../../api/types'
 import { RegistrosTable } from '../../components/RegistrosTable'
+import { Sidebarpage } from './Sidebarpage'
+import { EmpleadosPage } from './EmpleadosPage'
+import { Outlet } from 'react-router-dom'
 
 export function AdminPage() {
   const [empleados, setEmpleados] = useState<Empleado[]>([])
@@ -91,86 +94,10 @@ export function AdminPage() {
 
   return (
     <div className="page admin-page">
-      <aside className="panel">
-        <div className="panel-header">
-          <h2>Empleados</h2>
-          <button type="button" onClick={() => setShowCreateForm((v) => !v)}>
-            {showCreateForm ? 'Cancelar' : '+ Nuevo empleado'}
-          </button>
-        </div>
-
-        {showCreateForm && (
-          <form className="inline-form" onSubmit={handleCreate}>
-            <label>
-              Nombre completo
-              <input value={newNombre} onChange={(event) => setNewNombre(event.target.value)} required />
-            </label>
-            <label>
-              Usuario
-              <input value={newUsername} onChange={(event) => setNewUsername(event.target.value)} required />
-            </label>
-            <label>
-              Contraseña
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(event) => setNewPassword(event.target.value)}
-                required
-              />
-            </label>
-            {createError && <p className="error">{createError}</p>}
-            <button type="submit" className="primary" disabled={creating}>
-              {creating ? 'Creando…' : 'Crear empleado'}
-            </button>
-          </form>
-        )}
-
-        {loadingEmpleados ? (
-          <p>Cargando…</p>
-        ) : empleadosError ? (
-          <p className="error">{empleadosError}</p>
-        ) : (
-          <ul className="employee-list">
-            <li>
-              <button type="button" className={viewAll ? 'active' : ''} onClick={selectTodos}>
-                Todos los registros
-              </button>
-            </li>
-            {empleados.map((empleado) => (
-              <li key={empleado.id}>
-                <button
-                  type="button"
-                  className={selected?.id === empleado.id ? 'active' : ''}
-                  onClick={() => selectEmpleado(empleado)}
-                >
-                  {empleado.nombreCompleto} <span className="muted">@{empleado.username}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </aside>
-
-      <section className="panel registros-panel">
-        <h2>
-          {viewAll
-            ? 'Todos los registros'
-            : selected
-              ? `Registros de ${selected.nombreCompleto}`
-              : 'Selecciona un empleado'}
-        </h2>
-        {viewAll || selected ? (
-          loadingRegistros ? (
-            <p>Cargando…</p>
-          ) : registrosError ? (
-            <p className="error">{registrosError}</p>
-          ) : (
-            <RegistrosTable registros={registros} showEmpleado={viewAll} />
-          )
-        ) : (
-          <p className="empty">Elige un empleado o "Todos los registros" para ver los datos.</p>
-        )}
-      </section>
+      <Sidebarpage/>
+      <main className="admin-content">
+        <Outlet/>
+      </main>
     </div>
   )
 }
