@@ -11,6 +11,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import ec.cue.backend.exception.TokenExpiradoException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -44,8 +46,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authToken);
 			}
+		} catch (ExpiredJwtException ex) {
+			TokenExpiradoException tokenExpiradoException = new TokenExpiradoException();
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write("{\"message\":\"" + tokenExpiradoException.getMessage() + "\"}");
+			return;
 		} catch (JwtException | IllegalArgumentException ex) {
-			// token inválido o expirado: se deja sin autenticar, el endpoint responderá 401
+			// token inválido: se deja sin autenticar, el endpoint responderá 401
 		}
 
 		filterChain.doFilter(request, response);
