@@ -20,9 +20,8 @@ export function LoginPage() {
       navigate('/', { replace: true })
     } catch (err) {
       setError(
-        err instanceof ApiError && err.status === 401
-          ? 'Usuario o contraseña incorrectos'
-          : 'No se pudo iniciar sesión. Intenta de nuevo.',
+        err instanceof ApiError && err.status === 401 || err instanceof ApiError && err.status === 404 ? 'Usuario o contraseña incorrectos' 
+        : 'No se pudo iniciar sesión. Intenta de nuevo.',
       )
     } finally {
       setLoading(false)
