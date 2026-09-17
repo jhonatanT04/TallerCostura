@@ -4,7 +4,7 @@ export function Sidebarpage() {
 
   const listComponets = [
     { name: 'Home', href: '/admin/dashboard' },
-    { name: 'Ordenes', href: '/admin/ordenes' },
+    // { name: 'Ordenes', href: '/admin/ordenes' },
     { name: 'Registros', href: '/admin/registros' },
     { name: 'Empleados', href: '/admin/empleados' },
   ]

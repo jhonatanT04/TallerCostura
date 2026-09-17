@@ -43,27 +43,61 @@ export function EmpleadosPage() {
 
     return (
         <div className="page empleados-page">
-            <h2>Empleados</h2>
-            <p>Lista de empleados</p>
-            <button onClick={() => setShowCreateForm(true)}>Crear Empleado</button>
+            <div className="empleados-header">
+                <div>
+                    <h2>Empleados</h2>
+                    <p>Lista de empleados</p>
+                </div>
+
+                <button
+                    className="primary"
+                    onClick={() => setShowCreateForm(true)}
+                >
+                    Crear empleado
+                </button>
+            </div>
+
             {showCreateForm && (
-                <FormNewTrabajador onClose={() => setShowCreateForm(false)} onCreate={loadEmpleados} />
+                <FormNewTrabajador
+                    onClose={() => setShowCreateForm(false)}
+                    onCreate={loadEmpleados}
+                />
             )}
-            {empleadosError && <p className="error">{empleadosError}</p>}
+
+            {empleadosError && (
+                <p className="error">{empleadosError}</p>
+            )}
+
             {loadingEmpleados ? (
                 <p>Cargando empleados...</p>
             ) : (
-                <ul>
+                <ul className="empleados-list">
                     {empleados.map((empleado) => (
-                        <li key={empleado.id}>
-                            {empleado.nombreCompleto}
-                            <button onClick={() => handleSelectEmpleado(empleado)}>...</button>
-                            {select && selectedEmpleado?.id === empleado.id && (
-                                <ul>
-                                    <li>Editar</li>
-                                    <li>Eliminar</li>
-                                </ul>
-                            )}
+                        <li key={empleado.id} className="empleado-item">
+                            <span className="empleado-name">
+                                {empleado.nombreCompleto}
+                            </span>
+
+                            <div className="empleado-actions">
+                                <button
+                                    type="button"
+                                    className="employee-menu-button"
+                                    onClick={() => handleSelectEmpleado(empleado)}
+                                >
+                                    ⋮
+                                </button>
+
+                                {select && selectedEmpleado?.id === empleado.id && (
+                                    <ul className="employee-menu">
+                                        <li>
+                                            <button type="button">Editar</button>
+                                        </li>
+                                        <li>
+                                            <button type="button">Eliminar</button>
+                                        </li>
+                                    </ul>
+                                )}
+                            </div>
                         </li>
                     ))}
                 </ul>
