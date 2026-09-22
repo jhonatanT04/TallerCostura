@@ -56,6 +56,13 @@ export function LoginPage() {
         <button type="submit" className="primary" disabled={loading}>
           {loading ? 'Ingresando…' : 'Ingresar'}
         </button>
+        <button
+          type="button"
+          className="secondary"
+          onClick={() => navigate('/register')}
+        >
+          Crear una cuenta
+        </button>
       </form>
     </main>
   )

@@ -7,6 +7,12 @@ export interface AuthUser {
   nombreCompleto: string
 }
 
+export interface RegisterUser {
+  username: string
+  password: string
+  nombreCompleto: string
+}
+
 export interface Empleado {
   id: number
   username: string

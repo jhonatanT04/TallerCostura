@@ -13,6 +13,10 @@ export function RegistroPage() {
     const [selectEmpleado, setSelectEmpleado] = useState(false)
     const [selectViewAll, setSelectViewAll] = useState(true)
 
+    const [selectedDateRange, setSelectedDateRange] = useState('')
+    const [startDate, setStartDate] = useState('')
+    const [endDate, setEndDate] = useState('')
+
     function formatFecha(iso: string): string {
         return new Date(iso).toLocaleString()
     }
@@ -90,6 +94,47 @@ export function RegistroPage() {
                 </ul>
             )}
 
+            <div className="date-filter">
+                <label htmlFor="date">
+                    Seleccione un rango de fechas
+                </label>
+
+                <select
+                    id="date"
+                    value={selectedDateRange}
+                    onChange={(e) => setSelectedDateRange(e.target.value)}
+                >
+                    <option value="" disabled>
+                        Seleccione una opción
+                    </option>
+                    <option value="last-week">Semana anterior</option>
+                    <option value="two-weeks">Hace dos semanas</option>
+                    <option value="last-month">Último mes</option>
+                    <option value="custom">Fecha personalizada</option>
+                </select>
+
+                {selectedDateRange === 'custom' && (
+                    <div className="custom-date">
+                        <label>
+                            Desde
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                            />
+                        </label>
+
+                        <label>
+                            Hasta
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                            />
+                        </label>
+                    </div>
+                )}
+            </div>
             <div className="table-wrap">
                 {registrosError && (
                     <p className="error">{registrosError}</p>

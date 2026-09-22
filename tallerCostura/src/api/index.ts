@@ -10,6 +10,20 @@ export function login(username: string, password: string): Promise<AuthUser> {
     body: JSON.stringify({ username, password }),
   })
 }
+export function register(
+  nombreCompleto: string,
+  username: string,
+  password: string,
+): Promise<void> {
+  return apiFetch<void>('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      nombreCompleto,
+      username,
+      password,
+    }),
+  })
+}
 
 export function crearEmpleado(data: NuevoEmpleado): Promise<Empleado> {
   return apiFetch<Empleado>('/empleados', {
@@ -39,4 +53,12 @@ export function getMisRegistros(): Promise<RegistroDTO[]> {
 
 export function getTodosLosRegistros(): Promise<RegistroDTO[]> {
   return apiFetch<RegistroDTO[]>('/registros')
+}
+export function getRegistrosDate(fechaInicio?: string, fechaFin?: string): Promise<RegistroDTO[]> {
+  const params = new URLSearchParams()
+  if (fechaInicio) params.append('fechaInicio', fechaInicio)
+  if (fechaFin) params.append('fechaFin', fechaFin)
+
+  const query = params.toString()
+  return apiFetch<RegistroDTO[]>(`/empleados/registros${query ? `?${query}` : ''}`)
 }
