@@ -60,5 +60,5 @@ export function getRegistrosDate(fechaInicio?: string, fechaFin?: string): Promi
   if (fechaFin) params.append('fechaFin', fechaFin)
 
   const query = params.toString()
-  return apiFetch<RegistroDTO[]>(`/empleados/registros${query ? `?${query}` : ''}`)
+  return apiFetch<RegistroDTO[]>(`/registros/getForDate${query ? `?${query}` : ''}`)
 }
