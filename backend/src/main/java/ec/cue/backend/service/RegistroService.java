@@ -1,6 +1,9 @@
 package ec.cue.backend.service;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -70,9 +73,22 @@ public class RegistroService {
 				.toList();
 	}
 
+	public List<RegistroDTO> registrosPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
+		LocalDate inicioDate = fechaInicio != null ? fechaInicio : LocalDate.now();
+		LocalDate finDate = fechaFin != null ? fechaFin : LocalDate.now();
+
+		Instant inicio = inicioDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+		Instant fin = finDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant();
+
+		return registroBlusaRepository.findByFechaRegistroBetweenOrderByFechaRegistroDesc(inicio, fin).stream()
+				.map(this::toDto)
+				.toList();
+	}
+
 	private RegistroDTO toDto(RegistroBlusa registro) {
 		Usuario usuario = registro.getUsuario();
-		EmpleadoResponse empleado = new EmpleadoResponse(usuario.getId(), usuario.getUsername(), usuario.getNombreCompleto());
+		EmpleadoResponse empleado = new EmpleadoResponse(usuario.getId(), usuario.getUsername(),
+				usuario.getNombreCompleto());
 		return new RegistroDTO(
 				registro.getId(),
 				registro.getColor(),

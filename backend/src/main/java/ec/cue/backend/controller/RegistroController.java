@@ -1,7 +1,9 @@
 package ec.cue.backend.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.cue.backend.dto.CrearRegistroRequest;
@@ -38,5 +41,12 @@ public class RegistroController {
 	@GetMapping
 	public ResponseEntity<List<RegistroDTO>> todos() {
 		return ResponseEntity.ok(registroService.todos());
+	}
+	@GetMapping("/getForDate")
+	public ResponseEntity<List<RegistroDTO>> registrosDeEmpleados(Authentication authentication,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+
+		return ResponseEntity.ok(registroService.registrosPorFecha(fechaInicio, fechaFin));
 	}
 }

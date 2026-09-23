@@ -10,7 +10,7 @@ final class TallaCatalog {
 
 	static final Set<String> VALIDAS = Set.of(
 			"XS", "S", "M", "L", "XL", "XXL",
-			"36", "38", "40", "42", "44", "46");
+			"30","31","32","33","34","35","36", "38", "40", "42", "44", "46");
 
 	private TallaCatalog() {
 	}

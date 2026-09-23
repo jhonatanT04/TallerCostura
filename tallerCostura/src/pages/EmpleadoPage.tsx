@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { crearRegistro, getMisRegistros } from '../api'
 import type { RegistroDTO } from '../api/types'
 import { RegistrosTable } from '../components/RegistrosTable'
-import { TALLAS_LETRA, TALLAS_NUMERICO } from '../lib/talla'
+import { TALLAS_NUMERICO } from '../lib/talla'
 
 export function EmpleadoPage() {
   const [color, setColor] = useState('')
@@ -66,13 +66,6 @@ export function EmpleadoPage() {
             <option value="" disabled>
               Selecciona una talla
             </option>
-            <optgroup label="Letra">
-              {TALLAS_LETRA.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </optgroup>
             <optgroup label="Numérico">
               {TALLAS_NUMERICO.map((t) => (
                 <option key={t} value={t}>

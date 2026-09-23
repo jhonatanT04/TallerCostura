@@ -4,8 +4,6 @@ import { useAuth } from '../auth/AuthContext'
 export function Navbar() {
   const { user, logout } = useAuth()
 
-  if (!user) return null
-
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const menuRef = useRef<HTMLDivElement>(null)
@@ -26,7 +24,7 @@ export function Navbar() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
-
+  if (!user) return null
   return (
     <header className="navbar" >
       <span className="brand">Taller de Costura</span>

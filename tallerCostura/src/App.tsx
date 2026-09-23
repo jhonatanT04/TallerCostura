@@ -10,6 +10,7 @@ import { EmpleadosPage } from './pages/admin/EmpleadosPage'
 import { DashboardPage } from './pages/admin/DashboardPage'
 import { OrdenesPage } from './pages/admin/OrdenesPage'
 import { RegistroPage } from './pages/admin/RegistrosPage'
+import { RegisterPage } from './pages/RegisterPage'
 
 function HomeRedirect() {
   const { user } = useAuth()
@@ -22,6 +23,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route path="/register" element={ user ? <Navigate to="/" replace /> : <RegisterPage /> } />
       <Route
         path="/"
         element={
