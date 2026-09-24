@@ -88,7 +88,7 @@ public class RegistroService {
 	private RegistroDTO toDto(RegistroBlusa registro) {
 		Usuario usuario = registro.getUsuario();
 		EmpleadoResponse empleado = new EmpleadoResponse(usuario.getId(), usuario.getUsername(),
-				usuario.getNombreCompleto());
+				usuario.getNombreCompleto(), usuario.isActivo());
 		return new RegistroDTO(
 				registro.getId(),
 				registro.getColor(),

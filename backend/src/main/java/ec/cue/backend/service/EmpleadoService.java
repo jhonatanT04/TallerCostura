@@ -44,7 +44,18 @@ public class EmpleadoService {
 				.toList();
 	}
 
+	public EmpleadoResponse activar(Long id) {
+		Usuario usuario = usuarioRepository.findById(id)
+				.filter(u -> u.getRole() == Role.EMPLEADO)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado"));
+
+		usuario.setActivo(true);
+		usuario = usuarioRepository.save(usuario);
+
+		return toResponse(usuario);
+	}
+
 	private EmpleadoResponse toResponse(Usuario usuario) {
-		return new EmpleadoResponse(usuario.getId(), usuario.getUsername(), usuario.getNombreCompleto());
+		return new EmpleadoResponse(usuario.getId(), usuario.getUsername(), usuario.getNombreCompleto(), usuario.isActivo());
 	}
 }
