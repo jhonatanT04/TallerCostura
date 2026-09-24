@@ -45,8 +45,9 @@ public class RegistroController {
 	@GetMapping("/getForDate")
 	public ResponseEntity<List<RegistroDTO>> registrosDeEmpleados(Authentication authentication,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+			@RequestParam(required = false) Long empleadoId) {
 
-		return ResponseEntity.ok(registroService.registrosPorFecha(fechaInicio, fechaFin));
+		return ResponseEntity.ok(registroService.registrosPorFecha(fechaInicio, fechaFin, empleadoId));
 	}
 }
