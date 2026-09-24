@@ -10,8 +10,9 @@ export function RegistroPage() {
     const [loadingRegistros, setLoadingRegistros] = useState(false)
     const [registrosError, setRegistrosError] = useState<string | null>(null)
 
-    const [selectEmpleado, setSelectEmpleado] = useState(false)
-    const [selectViewAll, setSelectViewAll] = useState(true)
+    // null = "todos los empleados"
+    const [selectedEmpleadoId, setSelectedEmpleadoId] = useState<number | null>(null)
+    const [activeDateRange, setActiveDateRange] = useState<{ inicio: string; fin: string } | null>(null)
 
     const [selectedDateRange, setSelectedDateRange] = useState('')
     const [startDate, setStartDate] = useState('')
@@ -34,7 +35,7 @@ export function RegistroPage() {
         setEmpleadosError(null)
 
         try {
-            setEmpleados(await getEmpleados())
+            setEmpleados((await getEmpleados()).filter(e => e.activo==true))
         } catch {
             setEmpleadosError('No se pudo cargar la lista de empleados.')
         } finally {
@@ -46,58 +47,50 @@ export function RegistroPage() {
         loadEmpleados()
     }, [loadEmpleados])
 
-    const loadAllRegistros = useCallback(async () => {
-        setLoadingRegistros(true)
-        setSelectEmpleado(false)
-        setSelectViewAll(true)
-        setRegistrosError(null)
-
-        try {
-            setRegistros(await getTodosLosRegistros())
-        } catch {
-            setRegistrosError('No se pudo cargar la lista de registros.')
-        } finally {
-            setLoadingRegistros(false)
-        }
-    }, [])
-
-    const loadRegistrosByEmpleado = useCallback(async (empleadoId: number) => {
-        setLoadingRegistros(true)
-        setSelectEmpleado(true)
-        setSelectViewAll(false)
-        setRegistrosError(null)
-
-        try {
-            setRegistros(await getRegistrosDeEmpleado(empleadoId))
-        } catch {
-            setRegistrosError(
-                'No se pudo cargar la lista de registros del empleado.',
-            )
-        } finally {
-            setLoadingRegistros(false)
-        }
-    }, [])
-
-    const loadRegistrosByDate = useCallback(
-        async (fechaInicio: string, fechaFin: string) => {
+    const loadRegistros = useCallback(
+        async (empleadoId: number | null, dateRange: { inicio: string; fin: string } | null) => {
             setLoadingRegistros(true)
-            setSelectEmpleado(false)
-            setSelectViewAll(true)
             setRegistrosError(null)
 
             try {
-                setRegistros(
-                    await getRegistrosDate(fechaInicio, fechaFin),
-                )
+                if (dateRange) {
+                    setRegistros(
+                        await getRegistrosDate(dateRange.inicio, dateRange.fin, empleadoId ?? undefined),
+                    )
+                } else if (empleadoId !== null) {
+                    setRegistros(await getRegistrosDeEmpleado(empleadoId))
+                } else {
+                    setRegistros(await getTodosLosRegistros())
+                }
             } catch {
-                setRegistrosError(
-                    'No se pudo cargar los registros del rango seleccionado.',
-                )
+                setRegistrosError('No se pudo cargar la lista de registros.')
             } finally {
                 setLoadingRegistros(false)
             }
         },
         [],
+    )
+
+    const loadAllRegistros = useCallback(() => {
+        setSelectedEmpleadoId(null)
+        loadRegistros(null, activeDateRange)
+    }, [activeDateRange, loadRegistros])
+
+    const loadRegistrosByEmpleado = useCallback(
+        (empleadoId: number) => {
+            setSelectedEmpleadoId(empleadoId)
+            loadRegistros(empleadoId, activeDateRange)
+        },
+        [activeDateRange, loadRegistros],
+    )
+
+    const loadRegistrosByDate = useCallback(
+        (fechaInicio: string, fechaFin: string) => {
+            const dateRange = { inicio: fechaInicio, fin: fechaFin }
+            setActiveDateRange(dateRange)
+            loadRegistros(selectedEmpleadoId, dateRange)
+        },
+        [selectedEmpleadoId, loadRegistros],
     )
 
     const handleDateRangeChange = (
@@ -202,7 +195,7 @@ export function RegistroPage() {
                 <ul className="select-registros">
                     <li
                         onClick={loadAllRegistros}
-                        className="opcion-select select-all-registre"
+                        className={`opcion-select select-all-registre${selectedEmpleadoId === null ? ' selected' : ''}`}
                     >
                         Todos los empleados
                     </li>
@@ -213,7 +206,7 @@ export function RegistroPage() {
                             onClick={() =>
                                 loadRegistrosByEmpleado(empleado.id)
                             }
-                            className="opcion-select"
+                            className={`opcion-select${selectedEmpleadoId === empleado.id ? ' selected' : ''}`}
                         >
                             {empleado.nombreCompleto}
                         </li>
@@ -311,10 +304,9 @@ export function RegistroPage() {
                     <table className="table">
                         <thead>
                             <tr>
-                                {selectViewAll &&
-                                    !selectEmpleado && (
-                                        <th>Empleado</th>
-                                    )}
+                                {selectedEmpleadoId === null && (
+                                    <th>Empleado</th>
+                                )}
 
                                 <th>Color</th>
                                 <th>Talla</th>
@@ -328,15 +320,11 @@ export function RegistroPage() {
                         <tbody>
                             {registros.map((registro) => (
                                 <tr key={registro.id}>
-                                    {selectViewAll &&
-                                        !selectEmpleado && (
-                                            <td>
-                                                {
-                                                    registro.empleado
-                                                        .nombreCompleto
-                                                }
-                                            </td>
-                                        )}
+                                    {selectedEmpleadoId === null && (
+                                        <td>
+                                            {registro.empleado.nombreCompleto}
+                                        </td>
+                                    )}
 
                                     <td>{registro.color}</td>
                                     <td>{registro.talla}</td>
@@ -366,12 +354,7 @@ export function RegistroPage() {
                             {registros.length === 0 && (
                                 <tr>
                                     <td
-                                        colSpan={
-                                            selectViewAll &&
-                                                !selectEmpleado
-                                                ? 7
-                                                : 6
-                                        }
+                                        colSpan={selectedEmpleadoId === null ? 7 : 6}
                                         className="empty-table"
                                     >
                                         No hay registros para mostrar.

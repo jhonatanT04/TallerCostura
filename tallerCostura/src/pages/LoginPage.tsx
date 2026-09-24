@@ -1,11 +1,13 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const registered = Boolean((location.state as { registered?: boolean } | null)?.registered)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -21,7 +23,9 @@ export function LoginPage() {
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401
-          ? 'Usuario o contraseña incorrectos'
+          ? registered
+            ? 'Usuario o contraseña incorrectos. Si acabas de crear tu cuenta, también puede ser que la jefa aún no la haya activado.'
+            : 'Usuario o contraseña incorrectos'
           : 'No se pudo iniciar sesión. Intenta de nuevo.',
       )
     } finally {
@@ -34,6 +38,11 @@ export function LoginPage() {
       <form className="card" onSubmit={handleSubmit}>
         <h1>Taller de Costura</h1>
         <p className="subtitle">Inicia sesión para continuar</p>
+        {registered && (
+          <p className="info">
+            Cuenta creada. Espera a que la jefa la active antes de poder iniciar sesión.
+          </p>
+        )}
         <label>
           Usuario
           <input

@@ -17,6 +17,7 @@ export interface Empleado {
   id: number
   username: string
   nombreCompleto: string
+  activo: boolean
 }
 
 export interface RegistroDTO {
