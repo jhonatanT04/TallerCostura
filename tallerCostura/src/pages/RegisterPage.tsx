@@ -29,7 +29,7 @@ export function RegisterPage() {
     try {
       await register(nombreCompleto, username, password)
 
-      navigate('/login', { replace: true })
+      navigate('/login', { replace: true, state: { registered: true } })
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 409

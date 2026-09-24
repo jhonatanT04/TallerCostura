@@ -19,6 +19,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
 	}
 
+	@ExceptionHandler(UsuarioYaExisteException.class)
+	public ResponseEntity<Map<String, String>> handleUsuarioYaExiste(UsuarioYaExisteException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", ex.getMessage()));
+	}
+
 	@ExceptionHandler(TokenExpiradoException.class)
 	public ResponseEntity<Map<String, String>> handleTokenExpirado(TokenExpiradoException ex) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", ex.getMessage()));

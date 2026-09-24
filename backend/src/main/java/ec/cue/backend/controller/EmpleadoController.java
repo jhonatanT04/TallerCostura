@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,5 +41,10 @@ public class EmpleadoController {
 	@GetMapping("/{id}/registros")
 	public ResponseEntity<List<RegistroDTO>> registrosDeEmpleado(@PathVariable Long id) {
 		return ResponseEntity.ok(registroService.registrosPorEmpleado(id));
+	}
+
+	@PatchMapping("/{id}/activar")
+	public ResponseEntity<EmpleadoResponse> activar(@PathVariable Long id) {
+		return ResponseEntity.ok(empleadoService.activar(id));
 	}
 }

@@ -73,12 +73,22 @@ public class RegistroService {
 				.toList();
 	}
 
-	public List<RegistroDTO> registrosPorFecha(LocalDate fechaInicio, LocalDate fechaFin) {
+	public List<RegistroDTO> registrosPorFecha(LocalDate fechaInicio, LocalDate fechaFin, Long empleadoId) {
 		LocalDate inicioDate = fechaInicio != null ? fechaInicio : LocalDate.now();
 		LocalDate finDate = fechaFin != null ? fechaFin : LocalDate.now();
 
 		Instant inicio = inicioDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
 		Instant fin = finDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant();
+
+		if (empleadoId != null) {
+			if (!usuarioRepository.existsById(empleadoId)) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado");
+			}
+			return registroBlusaRepository
+					.findByUsuarioIdAndFechaRegistroBetweenOrderByFechaRegistroDesc(empleadoId, inicio, fin).stream()
+					.map(this::toDto)
+					.toList();
+		}
 
 		return registroBlusaRepository.findByFechaRegistroBetweenOrderByFechaRegistroDesc(inicio, fin).stream()
 				.map(this::toDto)
@@ -88,7 +98,7 @@ public class RegistroService {
 	private RegistroDTO toDto(RegistroBlusa registro) {
 		Usuario usuario = registro.getUsuario();
 		EmpleadoResponse empleado = new EmpleadoResponse(usuario.getId(), usuario.getUsername(),
-				usuario.getNombreCompleto());
+				usuario.getNombreCompleto(), usuario.isActivo());
 		return new RegistroDTO(
 				registro.getId(),
 				registro.getColor(),

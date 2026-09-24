@@ -36,6 +36,12 @@ export function getEmpleados(): Promise<Empleado[]> {
   return apiFetch<Empleado[]>('/empleados')
 }
 
+export function activarEmpleado(id: number): Promise<Empleado> {
+  return apiFetch<Empleado>(`/empleados/${id}/activar`, {
+    method: 'PATCH',
+  })
+}
+
 export function getRegistrosDeEmpleado(id: number): Promise<RegistroDTO[]> {
   return apiFetch<RegistroDTO[]>(`/empleados/${id}/registros`)
 }
@@ -54,10 +60,15 @@ export function getMisRegistros(): Promise<RegistroDTO[]> {
 export function getTodosLosRegistros(): Promise<RegistroDTO[]> {
   return apiFetch<RegistroDTO[]>('/registros')
 }
-export function getRegistrosDate(fechaInicio?: string, fechaFin?: string): Promise<RegistroDTO[]> {
+export function getRegistrosDate(
+  fechaInicio?: string,
+  fechaFin?: string,
+  empleadoId?: number,
+): Promise<RegistroDTO[]> {
   const params = new URLSearchParams()
   if (fechaInicio) params.append('fechaInicio', fechaInicio)
   if (fechaFin) params.append('fechaFin', fechaFin)
+  if (empleadoId !== undefined) params.append('empleadoId', String(empleadoId))
 
   const query = params.toString()
   return apiFetch<RegistroDTO[]>(`/registros/getForDate${query ? `?${query}` : ''}`)

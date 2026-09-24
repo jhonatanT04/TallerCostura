@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getEmpleados, type Empleado } from "../../api";
+import { activarEmpleado, getEmpleados, type Empleado } from "../../api";
 import { FormNewTrabajador } from "../../components/FormNewTrabajador";
 
 
@@ -13,6 +13,9 @@ export function EmpleadosPage() {
     const [select, setSelect] = useState(false)
 
     const [selectedEmpleado, setSelectedEmpleado] = useState<Empleado | null>(null)
+
+    const [activandoId, setActivandoId] = useState<number | null>(null)
+    const [activarError, setActivarError] = useState<string | null>(null)
 
 
     const loadEmpleados = useCallback(async () => {
@@ -39,6 +42,19 @@ export function EmpleadosPage() {
         }
         setSelect(true)
         setSelectedEmpleado(empleado)
+    }
+
+    const handleActivar = async (empleado: Empleado) => {
+        setActivarError(null)
+        setActivandoId(empleado.id)
+        try {
+            await activarEmpleado(empleado.id)
+            await loadEmpleados()
+        } catch {
+            setActivarError(`No se pudo activar a ${empleado.nombreCompleto}.`)
+        } finally {
+            setActivandoId(null)
+        }
     }
 
     return (
@@ -68,6 +84,10 @@ export function EmpleadosPage() {
                 <p className="error">{empleadosError}</p>
             )}
 
+            {activarError && (
+                <p className="error">{activarError}</p>
+            )}
+
             {loadingEmpleados ? (
                 <p>Cargando empleados...</p>
             ) : (
@@ -76,9 +96,21 @@ export function EmpleadosPage() {
                         <li key={empleado.id} className="empleado-item">
                             <span className="empleado-name">
                                 {empleado.nombreCompleto}
+                                {!empleado.activo && <span className="badge-pendiente">Pendiente</span>}
                             </span>
 
                             <div className="empleado-actions">
+                                {!empleado.activo && (
+                                    <button
+                                        type="button"
+                                        className="primary"
+                                        disabled={activandoId === empleado.id}
+                                        onClick={() => handleActivar(empleado)}
+                                    >
+                                        {activandoId === empleado.id ? 'Activando...' : 'Activar'}
+                                    </button>
+                                )}
+
                                 <button
                                     type="button"
                                     className="employee-menu-button"
