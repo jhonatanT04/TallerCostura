@@ -16,7 +16,7 @@ public class ConfiguracionPagoService {
 
 	private final ConfiguracionPagoRepository configuracionPagoRepository;
 
-	@Transactional(readOnly = true)
+	@Transactional
 	public ConfiguracionPagoDTO obtener() {
 		return toDto(obtenerEntidad());
 	}
