@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ec.cue.backend.dto.ActualizarPagoEmpleadoRequest;
 import ec.cue.backend.dto.CrearEmpleadoRequest;
 import ec.cue.backend.dto.EmpleadoResponse;
 import ec.cue.backend.dto.RegistroDTO;
@@ -46,5 +47,11 @@ public class EmpleadoController {
 	@PatchMapping("/{id}/activar")
 	public ResponseEntity<EmpleadoResponse> activar(@PathVariable Long id) {
 		return ResponseEntity.ok(empleadoService.activar(id));
+	}
+
+	@PatchMapping("/{id}/pago")
+	public ResponseEntity<EmpleadoResponse> actualizarPago(@PathVariable Long id,
+			@Valid @RequestBody ActualizarPagoEmpleadoRequest request) {
+		return ResponseEntity.ok(empleadoService.actualizarPago(id, request));
 	}
 }

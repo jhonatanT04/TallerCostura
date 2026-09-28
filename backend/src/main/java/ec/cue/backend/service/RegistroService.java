@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import ec.cue.backend.dto.CrearRegistroRequest;
@@ -26,6 +27,7 @@ public class RegistroService {
 	private final RegistroBlusaRepository registroBlusaRepository;
 	private final UsuarioRepository usuarioRepository;
 
+	@Transactional
 	public RegistroDTO crear(String username, CrearRegistroRequest request) {
 		if (!TallaCatalog.VALIDAS.contains(request.talla())) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Talla inválida: " + request.talla());
@@ -48,6 +50,7 @@ public class RegistroService {
 		return toDto(registro);
 	}
 
+	@Transactional(readOnly = true)
 	public List<RegistroDTO> misRegistros(String username) {
 		Usuario usuario = usuarioRepository.findByUsername(username)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
@@ -57,12 +60,14 @@ public class RegistroService {
 				.toList();
 	}
 
+	@Transactional(readOnly = true)
 	public List<RegistroDTO> todos() {
 		return registroBlusaRepository.findAllByOrderByFechaRegistroDesc().stream()
 				.map(this::toDto)
 				.toList();
 	}
 
+	@Transactional(readOnly = true)
 	public List<RegistroDTO> registrosPorEmpleado(Long empleadoId) {
 		if (!usuarioRepository.existsById(empleadoId)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado");
@@ -73,6 +78,7 @@ public class RegistroService {
 				.toList();
 	}
 
+	@Transactional(readOnly = true)
 	public List<RegistroDTO> registrosPorFecha(LocalDate fechaInicio, LocalDate fechaFin, Long empleadoId) {
 		LocalDate inicioDate = fechaInicio != null ? fechaInicio : LocalDate.now();
 		LocalDate finDate = fechaFin != null ? fechaFin : LocalDate.now();
@@ -98,7 +104,7 @@ public class RegistroService {
 	private RegistroDTO toDto(RegistroBlusa registro) {
 		Usuario usuario = registro.getUsuario();
 		EmpleadoResponse empleado = new EmpleadoResponse(usuario.getId(), usuario.getUsername(),
-				usuario.getNombreCompleto(), usuario.isActivo());
+				usuario.getNombreCompleto(), usuario.isActivo(), usuario.getPagoPorBlusa());
 		return new RegistroDTO(
 				registro.getId(),
 				registro.getColor(),
