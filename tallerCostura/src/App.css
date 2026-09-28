@@ -711,3 +711,142 @@ label {
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
 }
+
+/* Navbar (empleado) */
+.navbar-links {
+  display: flex;
+  gap: 16px;
+}
+
+.navbar-links a {
+  color: var(--text-h);
+  text-decoration: none;
+  opacity: 0.7;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* Estado vacío en tablas */
+.empty-table {
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* Órdenes */
+.orden-row {
+  cursor: pointer;
+}
+
+.orden-row:hover {
+  background-color: var(--accent-bg);
+}
+
+.orden-detail td {
+  background-color: var(--code-bg);
+  padding: 12px;
+}
+
+.orden-detail .table {
+  min-width: 0;
+  margin-top: 0;
+}
+
+.orden-item-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.orden-item-row label {
+  min-width: 120px;
+}
+
+/* Pagos */
+.pagos-page .panel {
+  margin-bottom: 20px;
+}
+
+.pagos-page .panel h3 {
+  margin: 0 0 12px;
+}
+
+/* Configuración de pagos (navbar) */
+.config-pago-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.config-pago-toggle {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-h);
+  border-radius: 6px;
+}
+
+.config-pago-toggle:hover {
+  background-color: var(--accent-bg);
+}
+
+.config-pago-panel {
+  top: calc(100% + 10px);
+  right: 0;
+  left: auto;
+  min-width: 240px;
+}
+
+.config-pago-panel h4 {
+  margin: 0 0 10px;
+  color: var(--text-h);
+}
+
+.config-pago-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100vw;
+  height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+
+  background-color: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  max-width: 92vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content .form-new-trabajador {
+  margin: 0;
+}

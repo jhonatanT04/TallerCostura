@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export function Sidebarpage() {
 
   const listComponets = [
     { name: 'Home', href: '/admin/dashboard' },
-    // { name: 'Ordenes', href: '/admin/ordenes' },
+    { name: 'Clientes', href: '/admin/clientes' },
+    { name: 'Ordenes', href: '/admin/ordenes' },
+    { name: 'Pagos', href: '/admin/pagos' },
     { name: 'Registros', href: '/admin/registros' },
     { name: 'Empleados', href: '/admin/empleados' },
   ]
@@ -14,9 +16,9 @@ export function Sidebarpage() {
       <nav className="sidebar">
         {listComponets.map((component) => (
           <span className="item-sidebar" key={component.href}>
-            <Link to={component.href}>
+            <NavLink to={component.href} className={({ isActive }) => (isActive ? 'active' : '')}>
               {component.name}
-            </Link>
+            </NavLink>
           </span>
         ))}
       </nav>

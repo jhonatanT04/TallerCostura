@@ -8,9 +8,12 @@ import { EmpleadoPage } from './pages/EmpleadoPage'
 import { LoginPage } from './pages/LoginPage'
 import { EmpleadosPage } from './pages/admin/EmpleadosPage'
 import { DashboardPage } from './pages/admin/DashboardPage'
+import { ClientesPage } from './pages/admin/ClientesPage'
 import { OrdenesPage } from './pages/admin/OrdenesPage'
+import { PagosPage } from './pages/admin/PagosPage'
 import { RegistroPage } from './pages/admin/RegistrosPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { MisPagosPage } from './pages/MisPagosPage'
 
 function HomeRedirect() {
   const { user } = useAuth()
@@ -41,6 +44,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/pagos"
+        element={
+          <ProtectedRoute allowedRoles={['EMPLEADO']}>
+            <MisPagosPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
@@ -50,7 +61,9 @@ function AppRoutes() {
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="clientes" element={<ClientesPage />} />
         <Route path="ordenes" element={<OrdenesPage/>} />
+        <Route path="pagos" element={<PagosPage />} />
         <Route path="registros" element={<RegistroPage/>} />
         <Route path="empleados" element={<EmpleadosPage />} />
       </Route>

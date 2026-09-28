@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { activarEmpleado, getEmpleados, type Empleado } from "../../api";
+import { FormEditarPago } from "../../components/FormEditarPago";
 import { FormNewTrabajador } from "../../components/FormNewTrabajador";
+import { Modal } from "../../components/Modal";
 
 
 export function EmpleadosPage() {
@@ -16,6 +18,8 @@ export function EmpleadosPage() {
 
     const [activandoId, setActivandoId] = useState<number | null>(null)
     const [activarError, setActivarError] = useState<string | null>(null)
+
+    const [editingEmpleado, setEditingEmpleado] = useState<Empleado | null>(null)
 
 
     const loadEmpleados = useCallback(async () => {
@@ -74,9 +78,19 @@ export function EmpleadosPage() {
             </div>
 
             {showCreateForm && (
-                <FormNewTrabajador
-                    onClose={() => setShowCreateForm(false)}
-                    onCreate={loadEmpleados}
+                <Modal onClose={() => setShowCreateForm(false)}>
+                    <FormNewTrabajador
+                        onClose={() => setShowCreateForm(false)}
+                        onCreate={loadEmpleados}
+                    />
+                </Modal>
+            )}
+
+            {editingEmpleado && (
+                <FormEditarPago
+                    empleado={editingEmpleado}
+                    onClose={() => setEditingEmpleado(null)}
+                    onUpdate={loadEmpleados}
                 />
             )}
 
@@ -96,6 +110,7 @@ export function EmpleadosPage() {
                         <li key={empleado.id} className="empleado-item">
                             <span className="empleado-name">
                                 {empleado.nombreCompleto}
+                                <span className="muted">${empleado.pagoPorBlusa.toFixed(2)} / blusa</span>
                                 {!empleado.activo && <span className="badge-pendiente">Pendiente</span>}
                             </span>
 
@@ -122,7 +137,16 @@ export function EmpleadosPage() {
                                 {select && selectedEmpleado?.id === empleado.id && (
                                     <ul className="employee-menu">
                                         <li>
-                                            <button type="button">Editar</button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setEditingEmpleado(empleado)
+                                                    setSelect(false)
+                                                    setSelectedEmpleado(null)
+                                                }}
+                                            >
+                                                Editar tarifa
+                                            </button>
                                         </li>
                                         <li>
                                             <button type="button">Eliminar</button>

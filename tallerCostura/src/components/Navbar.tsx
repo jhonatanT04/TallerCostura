@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import { ConfiguracionPagoMenu } from './ConfiguracionPagoMenu'
 
 export function Navbar() {
   const { user, logout } = useAuth()
@@ -28,7 +30,18 @@ export function Navbar() {
   return (
     <header className="navbar" >
       <span className="brand">Taller de Costura</span>
+      {user.role === 'EMPLEADO' && (
+        <nav className="navbar-links">
+          <NavLink to="/registros" className={({ isActive }) => (isActive ? 'active' : '')}>
+            Registros
+          </NavLink>
+          <NavLink to="/pagos" className={({ isActive }) => (isActive ? 'active' : '')}>
+            Mis pagos
+          </NavLink>
+        </nav>
+      )}
       <div className="navbar-user" ref={menuRef}>
+        {user.role === 'ADMIN' && <ConfiguracionPagoMenu />}
         <span onClick={() => setIsMenuOpen((value) => !value)} className="navbar-user-info">
           {user.username}{' '}
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

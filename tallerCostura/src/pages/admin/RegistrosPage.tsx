@@ -213,6 +213,13 @@ export function RegistroPage() {
                     ))}
                 </ul>
             )}
+
+            {selectedEmpleadoId === null && !activeDateRange && (
+                <p className="muted">
+                    Mostrando los últimos 30 días. Usa el filtro de fechas para ver un rango distinto.
+                </p>
+            )}
+
             <br />
 
             <div className="date-filter">

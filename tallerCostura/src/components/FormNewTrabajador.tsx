@@ -4,6 +4,7 @@ export function FormNewTrabajador({ onClose, onCreate }: { onClose: () => void; 
     const [newUsername, setNewUsername] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [newNombre, setNewNombre] = useState('')
+    const [newPagoPorBlusa, setNewPagoPorBlusa] = useState('0')
     const [creating, setCreating] = useState(false)
     const [createError, setCreateError] = useState<string | null>(null)
 
@@ -12,10 +13,16 @@ export function FormNewTrabajador({ onClose, onCreate }: { onClose: () => void; 
         setCreateError(null)
         setCreating(true)
         try {
-            await crearEmpleado({ username: newUsername, password: newPassword, nombreCompleto: newNombre })
+            await crearEmpleado({
+                username: newUsername,
+                password: newPassword,
+                nombreCompleto: newNombre,
+                pagoPorBlusa: Number(newPagoPorBlusa) || 0,
+            })
             setNewUsername('')
             setNewPassword('')
             setNewNombre('')
+            setNewPagoPorBlusa('0')
             onClose()
             onCreate()
         } catch {
@@ -59,6 +66,16 @@ export function FormNewTrabajador({ onClose, onCreate }: { onClose: () => void; 
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 required
+                            />
+                        </label>
+                        <label>
+                            Pago por blusa:
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={newPagoPorBlusa}
+                                onChange={(e) => setNewPagoPorBlusa(e.target.value)}
                             />
                         </label>
                         <button type="submit" disabled={creating}> Crear </button>
