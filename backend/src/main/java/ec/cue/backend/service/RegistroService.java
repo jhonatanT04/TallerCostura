@@ -1,5 +1,6 @@
 package ec.cue.backend.service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -60,9 +61,13 @@ public class RegistroService {
 				.toList();
 	}
 
+	
 	@Transactional(readOnly = true)
 	public List<RegistroDTO> todos() {
-		return registroBlusaRepository.findAllByOrderByFechaRegistroDesc().stream()
+		Instant hace30Dias = Instant.now().minus(Duration.ofDays(30));
+
+		return registroBlusaRepository.findByFechaRegistroBetweenOrderByFechaRegistroDesc(hace30Dias, Instant.now())
+				.stream()
 				.map(this::toDto)
 				.toList();
 	}
