@@ -29,7 +29,10 @@ export function Navbar() {
   if (!user) return null
   return (
     <header className="navbar" >
-      <span className="brand">Taller de Costura</span>
+      <span className="brand">
+        <img src="/favicon.png" alt="" className="brand-icon" />
+        Taller de Costura
+      </span>
       {user.role === 'EMPLEADO' && (
         <nav className="navbar-links">
           <NavLink to="/registros" className={({ isActive }) => (isActive ? 'active' : '')}>
