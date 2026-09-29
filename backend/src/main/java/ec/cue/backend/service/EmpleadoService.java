@@ -1,5 +1,6 @@
 package ec.cue.backend.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import ec.cue.backend.dto.ActualizarPagoEmpleadoRequest;
 import ec.cue.backend.dto.CrearEmpleadoRequest;
 import ec.cue.backend.dto.EmpleadoResponse;
 import ec.cue.backend.model.Role;
@@ -32,6 +34,7 @@ public class EmpleadoService {
 				.nombreCompleto(request.nombreCompleto())
 				.role(Role.EMPLEADO)
 				.activo(true)
+				.pagoPorBlusa(request.pagoPorBlusa() != null ? request.pagoPorBlusa() : BigDecimal.ZERO)
 				.build();
 		usuario = usuarioRepository.save(usuario);
 
@@ -55,7 +58,19 @@ public class EmpleadoService {
 		return toResponse(usuario);
 	}
 
+	public EmpleadoResponse actualizarPago(Long id, ActualizarPagoEmpleadoRequest request) {
+		Usuario usuario = usuarioRepository.findById(id)
+				.filter(u -> u.getRole() == Role.EMPLEADO)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado"));
+
+		usuario.setPagoPorBlusa(request.pagoPorBlusa());
+		usuario = usuarioRepository.save(usuario);
+
+		return toResponse(usuario);
+	}
+
 	private EmpleadoResponse toResponse(Usuario usuario) {
-		return new EmpleadoResponse(usuario.getId(), usuario.getUsername(), usuario.getNombreCompleto(), usuario.isActivo());
+		return new EmpleadoResponse(usuario.getId(), usuario.getUsername(), usuario.getNombreCompleto(),
+				usuario.isActivo(), usuario.getPagoPorBlusa());
 	}
 }

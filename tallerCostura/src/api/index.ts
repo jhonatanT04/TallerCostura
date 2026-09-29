@@ -1,8 +1,39 @@
 import { apiFetch } from './client'
-import type { AuthUser, Empleado, NuevoEmpleado, NuevoRegistro, RegistroDTO } from './types'
+import type {
+  AuthUser,
+  CalcularPagoInput,
+  Cliente,
+  ConfiguracionPagoDTO,
+  Empleado,
+  NuevaOrden,
+  NuevoCliente,
+  NuevoEmpleado,
+  NuevoRegistro,
+  OrdenDTO,
+  OrdenPagoDTO,
+  RegistroDTO,
+} from './types'
 
 export { ApiError } from './client'
-export type { AuthUser, Empleado, NuevoEmpleado, NuevoRegistro, RegistroDTO, Role } from './types'
+export type {
+  AuthUser,
+  CalcularPagoInput,
+  Cliente,
+  ConfiguracionPagoDTO,
+  Empleado,
+  EstadoPago,
+  ItemOrdenInput,
+  NuevaOrden,
+  NuevoCliente,
+  NuevoEmpleado,
+  NuevoRegistro,
+  OrdenDTO,
+  OrdenItemDTO,
+  OrdenPagoDTO,
+  RegisterUser,
+  RegistroDTO,
+  Role,
+} from './types'
 
 export function login(username: string, password: string): Promise<AuthUser> {
   return apiFetch<AuthUser>('/auth/login', {
@@ -42,6 +73,13 @@ export function activarEmpleado(id: number): Promise<Empleado> {
   })
 }
 
+export function actualizarPagoEmpleado(id: number, pagoPorBlusa: number): Promise<Empleado> {
+  return apiFetch<Empleado>(`/empleados/${id}/pago`, {
+    method: 'PATCH',
+    body: JSON.stringify({ pagoPorBlusa }),
+  })
+}
+
 export function getRegistrosDeEmpleado(id: number): Promise<RegistroDTO[]> {
   return apiFetch<RegistroDTO[]>(`/empleados/${id}/registros`)
 }
@@ -72,4 +110,66 @@ export function getRegistrosDate(
 
   const query = params.toString()
   return apiFetch<RegistroDTO[]>(`/registros/getForDate${query ? `?${query}` : ''}`)
+}
+
+export function crearCliente(data: NuevoCliente): Promise<Cliente> {
+  return apiFetch<Cliente>('/clientes', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export function getClientes(): Promise<Cliente[]> {
+  return apiFetch<Cliente[]>('/clientes')
+}
+
+export function crearOrden(data: NuevaOrden): Promise<OrdenDTO> {
+  return apiFetch<OrdenDTO>('/ordenes', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export function getOrdenes(): Promise<OrdenDTO[]> {
+  return apiFetch<OrdenDTO[]>('/ordenes')
+}
+
+export function getOrden(id: number): Promise<OrdenDTO> {
+  return apiFetch<OrdenDTO>(`/ordenes/${id}`)
+}
+
+export function getOrdenesDeCliente(clienteId: number): Promise<OrdenDTO[]> {
+  return apiFetch<OrdenDTO[]>(`/ordenes/cliente/${clienteId}`)
+}
+
+export function getConfiguracionPago(): Promise<ConfiguracionPagoDTO> {
+  return apiFetch<ConfiguracionPagoDTO>('/configuracion-pago')
+}
+
+export function actualizarConfiguracionPago(
+  data: ConfiguracionPagoDTO,
+): Promise<ConfiguracionPagoDTO> {
+  return apiFetch<ConfiguracionPagoDTO>('/configuracion-pago', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export function calcularPago(data: CalcularPagoInput): Promise<OrdenPagoDTO> {
+  return apiFetch<OrdenPagoDTO>('/pagos/calcular', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export function getPagos(): Promise<OrdenPagoDTO[]> {
+  return apiFetch<OrdenPagoDTO[]>('/pagos')
+}
+
+export function getPagosDeEmpleado(empleadoId: number): Promise<OrdenPagoDTO[]> {
+  return apiFetch<OrdenPagoDTO[]>(`/pagos/empleado/${empleadoId}`)
+}
+
+export function getMisPagos(): Promise<OrdenPagoDTO[]> {
+  return apiFetch<OrdenPagoDTO[]>('/pagos/mios')
 }

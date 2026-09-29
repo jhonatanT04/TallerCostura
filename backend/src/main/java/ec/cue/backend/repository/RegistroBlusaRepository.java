@@ -11,8 +11,6 @@ public interface RegistroBlusaRepository extends JpaRepository<RegistroBlusa, Lo
 
 	List<RegistroBlusa> findByUsuarioIdOrderByFechaRegistroDesc(Long usuarioId);
 
-	List<RegistroBlusa> findAllByOrderByFechaRegistroDesc();
-
 	List<RegistroBlusa> findByFechaRegistroBetweenOrderByFechaRegistroDesc(Instant fechaInicio, Instant fechaFin);
 
 	List<RegistroBlusa> findByUsuarioIdAndFechaRegistroBetweenOrderByFechaRegistroDesc(Long usuarioId, Instant fechaInicio, Instant fechaFin);
