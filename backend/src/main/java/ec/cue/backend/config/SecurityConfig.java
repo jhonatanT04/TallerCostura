@@ -55,6 +55,7 @@ public class SecurityConfig {
 						.accessDeniedHandler((req, res, ex) -> res.sendError(HttpServletResponse.SC_FORBIDDEN)))
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/ping").permitAll()
 						.requestMatchers("/api/empleados/**").hasRole("ADMIN")
 						.requestMatchers("/api/clientes/**").hasRole("ADMIN")
 						.requestMatchers("/api/ordenes/**").hasRole("ADMIN")
