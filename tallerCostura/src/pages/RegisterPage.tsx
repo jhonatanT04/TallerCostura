@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { register } from '../api'
+import { PasswordInput } from '../components/PasswordInput'
 
 export function RegisterPage() {
   
@@ -73,8 +74,7 @@ export function RegisterPage() {
 
         <label>
           Contraseña
-          <input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
@@ -83,8 +83,7 @@ export function RegisterPage() {
 
         <label>
           Confirmar contraseña
-          <input
-            type="password"
+          <PasswordInput
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             required

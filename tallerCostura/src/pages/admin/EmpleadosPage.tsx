@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { activarEmpleado, getEmpleados, type Empleado } from "../../api";
+import { ConfirmarEliminarEmpleado } from "../../components/ConfirmarEliminarEmpleado";
+import { FormCambiarPassword } from "../../components/FormCambiarPassword";
 import { FormEditarPago } from "../../components/FormEditarPago";
 import { FormNewTrabajador } from "../../components/FormNewTrabajador";
 import { Modal } from "../../components/Modal";
@@ -20,6 +22,13 @@ export function EmpleadosPage() {
     const [activarError, setActivarError] = useState<string | null>(null)
 
     const [editingEmpleado, setEditingEmpleado] = useState<Empleado | null>(null)
+    const [passwordEmpleado, setPasswordEmpleado] = useState<Empleado | null>(null)
+    const [deletingEmpleado, setDeletingEmpleado] = useState<Empleado | null>(null)
+
+    const closeMenu = () => {
+        setSelect(false)
+        setSelectedEmpleado(null)
+    }
 
 
     const loadEmpleados = useCallback(async () => {
@@ -94,6 +103,25 @@ export function EmpleadosPage() {
                 />
             )}
 
+            {passwordEmpleado && (
+                <Modal onClose={() => setPasswordEmpleado(null)}>
+                    <FormCambiarPassword
+                        empleado={passwordEmpleado}
+                        onClose={() => setPasswordEmpleado(null)}
+                    />
+                </Modal>
+            )}
+
+            {deletingEmpleado && (
+                <Modal onClose={() => setDeletingEmpleado(null)}>
+                    <ConfirmarEliminarEmpleado
+                        empleado={deletingEmpleado}
+                        onClose={() => setDeletingEmpleado(null)}
+                        onDelete={loadEmpleados}
+                    />
+                </Modal>
+            )}
+
             {empleadosError && (
                 <p className="error">{empleadosError}</p>
             )}
@@ -141,15 +169,33 @@ export function EmpleadosPage() {
                                                 type="button"
                                                 onClick={() => {
                                                     setEditingEmpleado(empleado)
-                                                    setSelect(false)
-                                                    setSelectedEmpleado(null)
+                                                    closeMenu()
                                                 }}
                                             >
                                                 Editar tarifa
                                             </button>
                                         </li>
                                         <li>
-                                            <button type="button">Eliminar</button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setPasswordEmpleado(empleado)
+                                                    closeMenu()
+                                                }}
+                                            >
+                                                Cambiar contraseña
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setDeletingEmpleado(empleado)
+                                                    closeMenu()
+                                                }}
+                                            >
+                                                Eliminar
+                                            </button>
                                         </li>
                                     </ul>
                                 )}

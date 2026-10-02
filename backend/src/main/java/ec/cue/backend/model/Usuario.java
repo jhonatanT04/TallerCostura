@@ -47,4 +47,8 @@ public class Usuario {
 	@Column(nullable = false, precision = 10, scale = 2, columnDefinition = "numeric(10,2) default 0")
 	@Builder.Default
 	private BigDecimal pagoPorBlusa = BigDecimal.ZERO;
+
+	@Column(nullable = false, columnDefinition = "boolean default false")
+	@Builder.Default
+	private boolean eliminado = false;
 }

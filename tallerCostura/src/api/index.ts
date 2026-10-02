@@ -80,6 +80,17 @@ export function actualizarPagoEmpleado(id: number, pagoPorBlusa: number): Promis
   })
 }
 
+export function cambiarPasswordEmpleado(id: number, password: string): Promise<void> {
+  return apiFetch<void>(`/empleados/${id}/password`, {
+    method: 'PATCH',
+    body: JSON.stringify({ password }),
+  })
+}
+
+export function eliminarEmpleado(id: number): Promise<void> {
+  return apiFetch<void>(`/empleados/${id}`, { method: 'DELETE' })
+}
+
 export function getRegistrosDeEmpleado(id: number): Promise<RegistroDTO[]> {
   return apiFetch<RegistroDTO[]>(`/empleados/${id}/registros`)
 }

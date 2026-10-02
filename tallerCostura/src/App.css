@@ -1018,3 +1018,50 @@ label {
   color: var(--chart-text-secondary);
   font-size: 11px;
 }
+/* Password input con mostrar/ocultar */
+.password-input {
+  position: relative;
+  display: flex;
+}
+
+.password-input input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.password-toggle:hover {
+  color: var(--text-h);
+}
+
+/* Confirmación de eliminación */
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+button.danger {
+  background: #d03b3b;
+  border-color: #d03b3b;
+  color: #fff;
+}

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import ec.cue.backend.dto.ActualizarPagoEmpleadoRequest;
+import ec.cue.backend.dto.CambiarPasswordRequest;
 import ec.cue.backend.dto.CrearEmpleadoRequest;
 import ec.cue.backend.dto.EmpleadoResponse;
 import ec.cue.backend.model.Role;
@@ -42,15 +43,13 @@ public class EmpleadoService {
 	}
 
 	public List<EmpleadoResponse> listar() {
-		return usuarioRepository.findByRole(Role.EMPLEADO).stream()
+		return usuarioRepository.findByRoleAndEliminadoFalse(Role.EMPLEADO).stream()
 				.map(this::toResponse)
 				.toList();
 	}
 
 	public EmpleadoResponse activar(Long id) {
-		Usuario usuario = usuarioRepository.findById(id)
-				.filter(u -> u.getRole() == Role.EMPLEADO)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado"));
+		Usuario usuario = buscarEmpleadoVigente(id);
 
 		usuario.setActivo(true);
 		usuario = usuarioRepository.save(usuario);
@@ -59,14 +58,34 @@ public class EmpleadoService {
 	}
 
 	public EmpleadoResponse actualizarPago(Long id, ActualizarPagoEmpleadoRequest request) {
-		Usuario usuario = usuarioRepository.findById(id)
-				.filter(u -> u.getRole() == Role.EMPLEADO)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado"));
+		Usuario usuario = buscarEmpleadoVigente(id);
 
 		usuario.setPagoPorBlusa(request.pagoPorBlusa());
 		usuario = usuarioRepository.save(usuario);
 
 		return toResponse(usuario);
+	}
+
+	public void cambiarPassword(Long id, CambiarPasswordRequest request) {
+		Usuario usuario = usuarioRepository.findById(id)
+				.filter(u -> !u.isEliminado())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+		usuario.setPassword(passwordEncoder.encode(request.password()));
+		usuarioRepository.save(usuario);
+	}
+
+	public void eliminar(Long id) {
+		Usuario usuario = buscarEmpleadoVigente(id);
+
+		usuario.setEliminado(true);
+		usuarioRepository.save(usuario);
+	}
+
+	private Usuario buscarEmpleadoVigente(Long id) {
+		return usuarioRepository.findById(id)
+				.filter(u -> u.getRole() == Role.EMPLEADO && !u.isEliminado())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado"));
 	}
 
 	private EmpleadoResponse toResponse(Usuario usuario) {
