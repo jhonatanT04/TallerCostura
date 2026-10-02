@@ -333,13 +333,14 @@ label {
 }
 
 .sidebar .item-sidebar {
-  padding: 9px 12px;
+  display: block;
   border-radius: 8px;
   transition: background-color 0.2s ease;
 }
 
 .item-sidebar a {
   display: block;
+  padding: 9px 12px;
   text-decoration: none;
   color: var(--text-h);
 }
@@ -353,35 +354,76 @@ label {
   font-weight: 600;
 }
 
+.sidebar-toggle {
+  display: none;
+}
+
 .admin-content {
   min-width: 0;
   width: 100%;
 }
+
 @media screen and (max-width: 768px) {
   .admin-page {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    padding: 12px;
   }
 
   .div-sidebar {
+    position: relative;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    overflow-x: auto;
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 600;
   }
 
   .div-sidebar .sidebar {
-    flex-direction: row;
-    gap: 8px;
-    width: max-content;
+    display: none;
+    margin-top: 6px;
+    padding: 6px;
+    gap: 2px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background-color: var(--bg);
+    box-shadow: var(--shadow);
   }
 
-  .sidebar .item-sidebar {
-    flex-shrink: 0;
-    padding: 8px 12px;
+  .div-sidebar .sidebar.open {
+    display: flex;
   }
 
   .item-sidebar a {
-    white-space: nowrap;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+  }
+
+  .item-sidebar:has(a.active) {
+    background-color: var(--accent-bg);
+  }
+
+  .admin-content .page {
+    padding: 4px 0 0;
+  }
+
+  .admin-content h1 {
+    font-size: 26px;
+    line-height: 1.2;
+    margin: 4px 0 12px;
+  }
+
+  .admin-content .panel {
+    padding: 14px;
   }
 }
 
@@ -645,29 +687,6 @@ label {
     max-width: none;
     padding: 16px;
   }
-}
-
-.div-sidebar .sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.sidebar .item-sidebar {
-  padding: 8px 12px;
-  border-radius: 6px;
-}
-
-.item-sidebar a {
-  text-decoration: none;
-  color: var(--text-h);
-}
-
-.item-sidebar:hover {
-  /* transform: translateX(5px); */
-  border: var(--accent-border);
-  transition: all 0.2s;
-  background-color: var(--accent-bg);
 }
 
 
@@ -966,8 +985,7 @@ label {
 
 .line-chart-svg {
   width: 100%;
-  height: auto;
-  aspect-ratio: 640 / 220;
+  height: 220px;
   overflow: visible;
 }
 

@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent } from 'react'
+import { useCallback, useRef, useState, type PointerEvent } from 'react'
 
 interface LinePoint {
   label: string
@@ -11,13 +11,11 @@ interface LineChartProps {
   color?: string
 }
 
-const WIDTH = 640
 const HEIGHT = 220
 const PAD_LEFT = 36
 const PAD_RIGHT = 12
 const PAD_TOP = 16
 const PAD_BOTTOM = 28
-const PLOT_WIDTH = WIDTH - PAD_LEFT - PAD_RIGHT
 const PLOT_HEIGHT = HEIGHT - PAD_TOP - PAD_BOTTOM
 
 export function LineChart({
@@ -26,11 +24,25 @@ export function LineChart({
   color = 'var(--chart-series-1)',
 }: LineChartProps) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
+  const [width, setWidth] = useState(640)
   const svgRef = useRef<SVGSVGElement>(null)
+
+  // Draw at the container's real pixel width so axis text keeps its size on small screens.
+  const containerRef = useCallback((el: HTMLDivElement | null) => {
+    if (!el) return
+    const measure = (w: number) => setWidth(Math.max(Math.round(w), 200))
+    measure(el.clientWidth)
+    const observer = new ResizeObserver(([entry]) => measure(entry.contentRect.width))
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   if (data.length === 0) {
     return <p className="empty">Sin datos todavía.</p>
   }
+
+  const WIDTH = width
+  const PLOT_WIDTH = WIDTH - PAD_LEFT - PAD_RIGHT
 
   const maxValue = Math.max(...data.map((d) => d.value), 1)
   const stepX = data.length > 1 ? PLOT_WIDTH / (data.length - 1) : 0
@@ -45,7 +57,7 @@ export function LineChart({
   const baseline = PAD_TOP + PLOT_HEIGHT
   const areaPath = `${linePath} L${points[points.length - 1].x.toFixed(1)},${baseline} L${points[0].x.toFixed(1)},${baseline} Z`
 
-  const yTicks = [0, 0.5, 1].map((t) => Math.round(maxValue * t))
+  const yTicks = [...new Set([0, 0.5, 1].map((t) => Math.round(maxValue * t)))]
 
   function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
     const svg = svgRef.current
@@ -59,7 +71,7 @@ export function LineChart({
   const hovered = hoverIndex !== null ? points[hoverIndex] : null
 
   return (
-    <div className="line-chart">
+    <div className="line-chart" ref={containerRef}>
       <svg
         ref={svgRef}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
