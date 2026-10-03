@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { ConfiguracionPagoMenu } from './ConfiguracionPagoMenu'
+import { AdminDrawer } from './Sidebar'
 
 export function Navbar() {
   const { user, logout } = useAuth()
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -33,10 +35,28 @@ export function Navbar() {
   if (!user) return null
   return (
     <header className="navbar" >
-      <span className="brand">
-        <img src="/favicon.png" alt="" className="brand-icon" />
-        Taller de Costura
-      </span>
+      <div className="navbar-left">
+        {user.role === 'ADMIN' && (
+          <button
+            type="button"
+            className="hamburger"
+            onClick={() => setIsDrawerOpen(true)}
+            aria-label="Abrir menú"
+            aria-expanded={isDrawerOpen}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        )}
+        <span className="brand">
+          <img src="/favicon.png" alt="" className="brand-icon" />
+          Taller de Costura
+        </span>
+      </div>
+      {user.role === 'ADMIN' && (
+        <AdminDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      )}
       <div className="navbar-user" ref={menuRef}>
         {user.role === 'ADMIN' && <ConfiguracionPagoMenu />}
         <span onClick={() => setIsMenuOpen((value) => !value)} className="navbar-user-info">
