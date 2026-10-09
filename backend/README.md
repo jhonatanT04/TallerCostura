@@ -103,10 +103,23 @@ curl http://localhost:8080/api/ping   # -> pong
 Los tests corren contra una base H2 en memoria (perfil `test`), no contra Postgres — no necesitas
 nada externo para correr `./mvnw test`.
 
+## Documentación interactiva (Swagger)
+
+Con el backend corriendo:
+
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- Especificación OpenAPI (JSON): `http://localhost:8080/v3/api-docs`
+
+Para probar endpoints protegidos: ejecuta `POST /api/auth/login` desde Swagger, copia el `token`
+de la respuesta, pulsa **Authorize** y pégalo (sin el prefijo `Bearer`).
+
+Ambas rutas son públicas, también en producción. Para desactivarlas, pon
+`springdoc.api-docs.enabled=false` y `springdoc.swagger-ui.enabled=false`.
+
 ## Endpoints
 
-Todas las rutas salvo `/api/auth/**` y `GET /api/ping` requieren el header
-`Authorization: Bearer <token>`.
+Todas las rutas salvo `/api/auth/**`, `GET /api/ping` y la documentación Swagger requieren el
+header `Authorization: Bearer <token>`.
 
 ### Auth (públicas)
 
