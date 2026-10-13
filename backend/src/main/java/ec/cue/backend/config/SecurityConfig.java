@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -44,7 +45,24 @@ public class SecurityConfig {
 		return new org.springframework.security.authentication.ProviderManager(provider);
 	}
 
+	// El navegador no puede mandar el JWT al abrir una página, así que la documentación usa HTTP
+	// Basic con las mismas credenciales de la app; solo una cuenta ADMIN puede verla.
 	@Bean
+	@Order(1)
+	public SecurityFilterChain docsSecurityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager)
+			throws Exception {
+		http
+				.securityMatcher("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+				.authenticationManager(authenticationManager)
+				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.httpBasic(basic -> basic.realmName("Documentacion Costureria"))
+				.authorizeHttpRequests(auth -> auth.anyRequest().hasRole("ADMIN"));
+
+		return http.build();
+	}
+
+	@Bean
+	@Order(2)
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.csrf(csrf -> csrf.disable())
@@ -56,7 +74,6 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/ping").permitAll()
-						.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 						.requestMatchers("/api/empleados/**").hasRole("ADMIN")
 						.requestMatchers("/api/clientes/**").hasRole("ADMIN")
 						.requestMatchers("/api/ordenes/**").hasRole("ADMIN")
