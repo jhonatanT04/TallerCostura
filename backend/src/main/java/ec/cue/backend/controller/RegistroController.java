@@ -42,6 +42,7 @@ public class RegistroController {
 	public ResponseEntity<List<RegistroDTO>> todos() {
 		return ResponseEntity.ok(registroService.todos());
 	}
+
 	@GetMapping("/getForDate")
 	public ResponseEntity<List<RegistroDTO>> registrosDeEmpleados(Authentication authentication,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,

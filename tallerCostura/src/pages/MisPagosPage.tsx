@@ -36,8 +36,8 @@ export function MisPagosPage() {
               <tr>
                 <th>Semana</th>
                 <th>Blusas</th>
-                <th>Con mullos</th>
-                <th>Con ataches</th>
+                <th>Mullos puestos</th>
+                <th>Ataches puestos</th>
                 <th>Monto blusas</th>
                 <th>Monto mullos</th>
                 <th>Monto ataches</th>

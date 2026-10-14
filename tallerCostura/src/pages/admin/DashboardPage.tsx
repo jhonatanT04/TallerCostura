@@ -52,7 +52,7 @@ export function DashboardPage() {
     for (const registro of registros) {
       const key = registro.fechaRegistro.slice(0, 10)
       if (totals.has(key)) {
-        totals.set(key, (totals.get(key) ?? 0) + registro.cantidad)
+        totals.set(key, (totals.get(key) ?? 0) + registro.cantidadConfeccion)
       }
     }
     return days.map((day) => ({ label: day.slice(5).split('-').reverse().join('/'), value: totals.get(day) ?? 0 }))

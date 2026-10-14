@@ -33,17 +33,20 @@ public class RegistroService {
 		if (!TallaCatalog.VALIDAS.contains(request.talla())) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Talla inválida: " + request.talla());
 		}
+		if (request.cantidadConfeccion() == 0 && request.cantidadMullos() == 0 && request.cantidadAtaches() == 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe registrar al menos una cantidad");
+		}
 
 		Usuario usuario = usuarioRepository.findByUsername(username)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
 		RegistroBlusa registro = RegistroBlusa.builder()
 				.usuario(usuario)
-				.color(request.color())
+				.color(request.color().trim())
 				.talla(request.talla())
-				.tieneMullos(request.tieneMullos())
-				.tieneAtaches(request.tieneAtaches())
-				.cantidad(request.cantidad())
+				.cantidadConfeccion(request.cantidadConfeccion())
+				.cantidadMullos(request.cantidadMullos())
+				.cantidadAtaches(request.cantidadAtaches())
 				.fechaRegistro(Instant.now())
 				.build();
 		registro = registroBlusaRepository.save(registro);
@@ -114,9 +117,9 @@ public class RegistroService {
 				registro.getId(),
 				registro.getColor(),
 				registro.getTalla(),
-				registro.isTieneMullos(),
-				registro.isTieneAtaches(),
-				registro.getCantidad(),
+				registro.getCantidadConfeccion(),
+				registro.getCantidadMullos(),
+				registro.getCantidadAtaches(),
 				registro.getFechaRegistro(),
 				empleado);
 	}

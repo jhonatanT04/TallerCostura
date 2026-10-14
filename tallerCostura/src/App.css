@@ -221,6 +221,11 @@ label {
   min-width: 140px;
 }
 
+.tipo-registro {
+  max-width: 260px;
+  margin-bottom: 12px;
+}
+
 /* page registros */
 
 /* Tabla de registros */

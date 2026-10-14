@@ -16,6 +16,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Trabajo hecho por una empleada sobre blusas de un color y talla. Confección, mullos y ataches
+ * son trabajos independientes: una empleada puede poner mullos/ataches a blusas que confeccionó
+ * otra, por eso cada uno lleva su propia cantidad.
+ */
 @Entity
 @Table(name = "registros_blusa")
 @Data
@@ -38,14 +43,14 @@ public class RegistroBlusa {
 	@Column(nullable = false)
 	private String talla;
 
-	@Column(nullable = false)
-	private boolean tieneMullos;
+	@Column(nullable = false, columnDefinition = "integer default 0")
+	private int cantidadConfeccion;
 
-	@Column(nullable = false)
-	private boolean tieneAtaches;
+	@Column(nullable = false, columnDefinition = "integer default 0")
+	private int cantidadMullos;
 
-	@Column(nullable = false)
-	private int cantidad;
+	@Column(nullable = false, columnDefinition = "integer default 0")
+	private int cantidadAtaches;
 
 	@Column(nullable = false)
 	private Instant fechaRegistro;
