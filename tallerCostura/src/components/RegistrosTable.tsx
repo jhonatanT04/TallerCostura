@@ -22,9 +22,9 @@ export function RegistrosTable({ registros, showEmpleado = false }: RegistrosTab
             {showEmpleado && <th>Empleado</th>}
             <th>Color</th>
             <th>Talla</th>
+            <th>Confeccionadas</th>
             <th>Mullos</th>
             <th>Ataches</th>
-            <th>Cantidad</th>
             <th>Fecha</th>
           </tr>
         </thead>
@@ -34,9 +34,9 @@ export function RegistrosTable({ registros, showEmpleado = false }: RegistrosTab
               {showEmpleado && <td>{registro.empleado.nombreCompleto}</td>}
               <td>{registro.color}</td>
               <td>{registro.talla}</td>
-              <td>{registro.tieneMullos ? 'Sí' : 'No'}</td>
-              <td>{registro.tieneAtaches ? 'Sí' : 'No'}</td>
-              <td>{registro.cantidad}</td>
+              <td>{registro.cantidadConfeccion}</td>
+              <td>{registro.cantidadMullos}</td>
+              <td>{registro.cantidadAtaches}</td>
               <td>{formatFecha(registro.fechaRegistro)}</td>
             </tr>
           ))}

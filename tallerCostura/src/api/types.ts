@@ -25,9 +25,9 @@ export interface RegistroDTO {
   id: number
   color: string
   talla: string
-  tieneMullos: boolean
-  tieneAtaches: boolean
-  cantidad: number
+  cantidadConfeccion: number
+  cantidadMullos: number
+  cantidadAtaches: number
   fechaRegistro: string
   empleado: {
     id: number
@@ -39,9 +39,9 @@ export interface RegistroDTO {
 export interface NuevoRegistro {
   color: string
   talla: string
-  tieneMullos: boolean
-  tieneAtaches: boolean
-  cantidad: number
+  cantidadConfeccion: number
+  cantidadMullos: number
+  cantidadAtaches: number
 }
 
 export interface NuevoEmpleado {

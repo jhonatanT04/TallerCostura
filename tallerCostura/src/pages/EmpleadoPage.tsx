@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
-import { crearRegistro, getMisRegistros } from '../api'
+import { ApiError, crearRegistro, getMisRegistros } from '../api'
 import type { RegistroDTO } from '../api/types'
 import { RegistrosTable } from '../components/RegistrosTable'
 import { TALLAS_NUMERICO } from '../lib/talla'
 
+type ModoRegistro = 'confeccion' | 'mullosAtaches'
+
 export function EmpleadoPage() {
+  const [modo, setModo] = useState<ModoRegistro>('confeccion')
   const [color, setColor] = useState('')
   const [talla, setTalla] = useState('')
-  const [tieneMullos, setTieneMullos] = useState(false)
-  const [tieneAtaches, setTieneAtaches] = useState(false)
-  const [cantidad, setCantidad] = useState(1)
+  const [cantidadConfeccion, setCantidadConfeccion] = useState(1)
+  const [cantidadMullos, setCantidadMullos] = useState(0)
+  const [cantidadAtaches, setCantidadAtaches] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -33,20 +36,46 @@ export function EmpleadoPage() {
     loadRegistros()
   }, [loadRegistros])
 
+  function reiniciarCantidades() {
+    setCantidadConfeccion(1)
+    setCantidadMullos(0)
+    setCantidadAtaches(0)
+  }
+
+  function cambiarModo(nuevoModo: ModoRegistro) {
+    setModo(nuevoModo)
+    setFormError(null)
+    reiniciarCantidades()
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setFormError(null)
+    if (modo === 'confeccion' && cantidadConfeccion < 1) {
+      setFormError('Ingresa al menos 1 blusa confeccionada.')
+      return
+    }
+    if (modo === 'mullosAtaches' && cantidadMullos + cantidadAtaches <= 0) {
+      setFormError('Ingresa al menos un mullo o un atache.')
+      return
+    }
     setSubmitting(true)
     try {
-      await crearRegistro({ color, talla, tieneMullos, tieneAtaches, cantidad })
+      await crearRegistro(
+        modo === 'confeccion'
+          ? { color: color.trim(), talla, cantidadConfeccion, cantidadMullos: 0, cantidadAtaches: 0 }
+          : { color: color.trim(), talla, cantidadConfeccion: 0, cantidadMullos, cantidadAtaches },
+      )
       setColor('')
       setTalla('')
-      setTieneMullos(false)
-      setTieneAtaches(false)
-      setCantidad(1)
+      reiniciarCantidades()
       await loadRegistros()
-    } catch {
-      setFormError('No se pudo guardar el registro. Intenta de nuevo.')
+    } catch (err) {
+      setFormError(
+        err instanceof ApiError && err.status === 400 && err.message
+          ? err.message
+          : 'No se pudo guardar el registro. Intenta de nuevo.',
+      )
     } finally {
       setSubmitting(false)
     }
@@ -56,6 +85,13 @@ export function EmpleadoPage() {
     <div className="page">
       <h2>Registrar blusa</h2>
       <form className="registro-form" onSubmit={handleSubmit}>
+        <label>
+          Tipo de registro
+          <select value={modo} onChange={(event) => cambiarModo(event.target.value as ModoRegistro)}>
+            <option value="confeccion">Blusas confeccionadas</option>
+            <option value="mullosAtaches">Mullos y ataches</option>
+          </select>
+        </label>
         <label>
           Color
           <input value={color} onChange={(event) => setColor(event.target.value)} required />
@@ -75,32 +111,39 @@ export function EmpleadoPage() {
             </optgroup>
           </select>
         </label>
-        <label>
-          Cantidad
-          <input
-            type="number"
-            min={1}
-            value={cantidad}
-            onChange={(event) => setCantidad(Number(event.target.value))}
-            required
-          />
-        </label>
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={tieneMullos}
-            onChange={(event) => setTieneMullos(event.target.checked)}
-          />
-          Mullos
-        </label>
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={tieneAtaches}
-            onChange={(event) => setTieneAtaches(event.target.checked)}
-          />
-          Ataches
-        </label>
+        {modo === 'confeccion' ? (
+          <label>
+            Blusas confeccionadas
+            <input
+              type="number"
+              min={1}
+              value={cantidadConfeccion}
+              onChange={(event) => setCantidadConfeccion(Math.max(0, Number(event.target.value) || 0))}
+              required
+            />
+          </label>
+        ) : (
+          <>
+            <label>
+              Mullos puestos
+              <input
+                type="number"
+                min={0}
+                value={cantidadMullos}
+                onChange={(event) => setCantidadMullos(Math.max(0, Number(event.target.value) || 0))}
+              />
+            </label>
+            <label>
+              Ataches puestos
+              <input
+                type="number"
+                min={0}
+                value={cantidadAtaches}
+                onChange={(event) => setCantidadAtaches(Math.max(0, Number(event.target.value) || 0))}
+              />
+            </label>
+          </>
+        )}
         <button type="submit" className="primary" disabled={submitting}>
           {submitting ? 'Guardando…' : 'Registrar'}
         </button>

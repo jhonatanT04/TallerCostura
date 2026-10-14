@@ -1,4 +1,4 @@
-const API_URL = 'https://tallercostura.onrender.com/api'
+const API_URL = 'http://localhost:8080/api'
 
 const AUTH_STORAGE_KEY = 'auth'
 
@@ -39,11 +39,13 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   }
   if (!res.ok) {
     let message = res.statusText
-    try {
-      const data = await res.json()
-      message = data?.message ?? message
-    } catch {
-      throw new ApiError(res.status, message)
+    const text = await res.text().catch(() => '')
+    if (text) {
+      try {
+        message = JSON.parse(text)?.message ?? message
+      } catch {
+        message = text
+      }
     }
     throw new ApiError(res.status, message)
   }
