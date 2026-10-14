@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import ec.cue.backend.security.JwtAuthenticationFilter;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -72,6 +73,9 @@ public class SecurityConfig {
 						.authenticationEntryPoint((req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
 						.accessDeniedHandler((req, res, ex) -> res.sendError(HttpServletResponse.SC_FORBIDDEN)))
 				.authorizeHttpRequests(auth -> auth
+						// sendError (404, 403, 500…) reenvía a /error sin el JWT; si no se permite, ese
+						// reenvío responde 401 y el frontend cierra la sesión.
+						.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
 						.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/ping").permitAll()
 						.requestMatchers("/api/empleados/**").hasRole("ADMIN")
@@ -83,8 +87,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/api/registros").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.GET, "/api/registros/getForDate").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.POST, "/api/registros").hasRole("EMPLEADO")
-						.requestMatchers(HttpMethod.GET, "/api/registros/mios").hasRole("EMPLEADO")
-						.anyRequest().authenticated())
+						.requestMatchers(HttpMethod.GET, "/api/registros/mios").hasRole("EMPLEADO")						.anyRequest().authenticated())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();

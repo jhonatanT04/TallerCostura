@@ -6,9 +6,9 @@ public record RegistroDTO(
 		Long id,
 		String color,
 		String talla,
-		boolean tieneMullos,
-		boolean tieneAtaches,
-		int cantidad,
+		int cantidadConfeccion,
+		int cantidadMullos,
+		int cantidadAtaches,
 		Instant fechaRegistro,
 		EmpleadoResponse empleado) {
 }

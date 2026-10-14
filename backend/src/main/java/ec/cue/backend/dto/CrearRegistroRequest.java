@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 public record CrearRegistroRequest(
 		@NotBlank String color,
 		@NotBlank String talla,
-		boolean tieneMullos,
-		boolean tieneAtaches,
-		@Min(value = 1, message = "La cantidad debe ser al menos 1") int cantidad) {
+		@Min(value = 0, message = "La cantidad de confección no puede ser negativa") int cantidadConfeccion,
+		@Min(value = 0, message = "La cantidad de mullos no puede ser negativa") int cantidadMullos,
+		@Min(value = 0, message = "La cantidad de ataches no puede ser negativa") int cantidadAtaches) {
 }

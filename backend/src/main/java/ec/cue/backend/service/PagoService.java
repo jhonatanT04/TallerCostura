@@ -56,9 +56,9 @@ public class PagoService {
 		List<RegistroBlusa> registros = registroBlusaRepository
 				.findByUsuarioIdAndFechaRegistroBetweenOrderByFechaRegistroDesc(usuario.getId(), inicio, fin);
 
-		int totalBlusas = registros.stream().mapToInt(RegistroBlusa::getCantidad).sum();
-		int totalConMullos = registros.stream().filter(RegistroBlusa::isTieneMullos).mapToInt(RegistroBlusa::getCantidad).sum();
-		int totalConAtaches = registros.stream().filter(RegistroBlusa::isTieneAtaches).mapToInt(RegistroBlusa::getCantidad).sum();
+		int totalBlusas = registros.stream().mapToInt(RegistroBlusa::getCantidadConfeccion).sum();
+		int totalConMullos = registros.stream().mapToInt(RegistroBlusa::getCantidadMullos).sum();
+		int totalConAtaches = registros.stream().mapToInt(RegistroBlusa::getCantidadAtaches).sum();
 
 		ConfiguracionPago configuracion = configuracionPagoService.obtenerEntidad();
 
