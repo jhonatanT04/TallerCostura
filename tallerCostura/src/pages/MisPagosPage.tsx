@@ -5,8 +5,8 @@ function formatMoney(n: number): string {
   return n.toFixed(2)
 }
 
-function formatFecha(iso: string): string {
-  return new Date(iso).toLocaleString()
+function formatFecha(iso: string | null): string {
+  return iso ? new Date(iso).toLocaleString() : '—'
 }
 
 export function MisPagosPage() {

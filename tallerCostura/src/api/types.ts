@@ -95,10 +95,11 @@ export interface ConfiguracionPagoDTO {
   precioAtaches: number
 }
 
-export type EstadoPago = 'PAGADO'
+export type EstadoPago = 'PENDIENTE' | 'PAGADO'
 
+// id y fechaPago son null solo en una previsualización (GET /pagos/previsualizar), que no se guarda.
 export interface OrdenPagoDTO {
-  id: number
+  id: number | null
   empleado: {
     id: number
     username: string
@@ -116,7 +117,7 @@ export interface OrdenPagoDTO {
   montoAtaches: number
   montoTotal: number
   estado: EstadoPago
-  fechaPago: string
+  fechaPago: string | null
 }
 
 export interface CalcularPagoInput {

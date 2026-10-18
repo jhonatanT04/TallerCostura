@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ApiError, crearRegistro } from '../api'
+import { crearRegistro, mensajeDeError } from '../api'
 import type { NuevoRegistro } from '../api/types'
 
 // Envío y manejo de errores compartido por los formularios de registro de blusas.
@@ -15,11 +15,7 @@ export function useGuardarRegistro(onRegistrado: () => void) {
       onRegistrado()
       return true
     } catch (err) {
-      setError(
-        err instanceof ApiError && err.status === 400 && err.message
-          ? err.message
-          : 'No se pudo guardar el registro. Intenta de nuevo.',
-      )
+      setError(mensajeDeError(err, 'No se pudo guardar el registro. Intenta de nuevo.'))
       return false
     } finally {
       setSubmitting(false)

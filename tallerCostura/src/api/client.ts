@@ -1,14 +1,24 @@
-const API_URL = 'https://tallercostura.onrender.com/api'
+const API_URL = 'http://localhost:8080/api'
 
 const AUTH_STORAGE_KEY = 'auth'
 
 export class ApiError extends Error {
   status: number
+  // Mensaje que mandó el backend en el body; null si solo hay statusText.
+  serverMessage: string | null
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, serverMessage: string | null = null) {
     super(message)
     this.status = status
+    this.serverMessage = serverMessage
   }
+}
+
+// Mensaje legible para mostrar: el del backend en errores de validación/conflicto, si no el genérico.
+export function mensajeDeError(err: unknown, generico: string): string {
+  return err instanceof ApiError && [400, 404, 409].includes(err.status) && err.serverMessage
+    ? err.serverMessage
+    : generico
 }
 
 function getToken(): string | null {
@@ -38,21 +48,22 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     throw new ApiError(res.status, res.statusText)
   }
   if (!res.ok) {
-    let message = res.statusText
+    let serverMessage: string | null = null
     const text = await res.text().catch(() => '')
     if (text) {
       try {
-        message = JSON.parse(text)?.message ?? message
+        serverMessage = JSON.parse(text)?.message ?? null
       } catch {
-        message = text
+        serverMessage = text
       }
     }
-    throw new ApiError(res.status, message)
+    throw new ApiError(res.status, serverMessage ?? res.statusText, serverMessage)
   }
 
-  if (res.status === 204 || res.status === 201) {
+  // 201 puede traer el recurso creado (p. ej. /pagos/calcular); solo un body vacío es undefined.
+  if (res.status === 204) {
     return undefined as T
   }
-
-  return res.json() as Promise<T>
+  const text = await res.text()
+  return (text ? JSON.parse(text) : undefined) as T
 }

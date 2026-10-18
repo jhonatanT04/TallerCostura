@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -38,11 +39,26 @@ public class PagoService {
 
 	@Transactional
 	public OrdenPagoDTO calcular(CalcularPagoRequest request) {
-		Usuario usuario = usuarioRepository.findById(request.empleadoId())
+		OrdenPago ordenPago = armarOrdenPago(request.empleadoId(), request.semanaInicio());
+		ordenPago.setEstado(EstadoPago.PAGADO);
+		ordenPago.setFechaPago(Instant.now());
+		ordenPago = ordenPagoRepository.save(ordenPago);
+
+		return toDto(ordenPago);
+	}
+
+	// Mismo cálculo que calcular, pero sin guardar: id y fechaPago quedan en null y el estado en
+	// PENDIENTE. No es readOnly porque obtenerEntidad() puede insertar la configuración por defecto.
+	@Transactional
+	public OrdenPagoDTO previsualizar(Long empleadoId, LocalDate semanaInicio) {
+		return toDto(armarOrdenPago(empleadoId, semanaInicio));
+	}
+
+	private OrdenPago armarOrdenPago(Long empleadoId, LocalDate semanaInicio) {
+		Usuario usuario = usuarioRepository.findById(empleadoId)
 				.filter(u -> u.getRole() == Role.EMPLEADO)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empleado no encontrado"));
 
-		LocalDate semanaInicio = request.semanaInicio();
 		LocalDate semanaFin = semanaInicio.plusDays(6);
 
 		if (ordenPagoRepository.existsByUsuarioIdAndSemanaInicio(usuario.getId(), semanaInicio)) {
@@ -62,12 +78,28 @@ public class PagoService {
 
 		ConfiguracionPago configuracion = configuracionPagoService.obtenerEntidad();
 
+		// Un pago no se puede deshacer, así que no se permite pagar trabajo con tarifa 0. Se juntan
+		// todos los problemas en un mensaje para que la ADMIN los corrija de una vez.
+		List<String> sinTarifa = new ArrayList<>();
+		if (totalBlusas > 0 && usuario.getPagoPorBlusa().signum() == 0) {
+			sinTarifa.add("El empleado " + usuario.getNombreCompleto() + " no tiene tarifa por blusa configurada");
+		}
+		if (totalConMullos > 0 && configuracion.getPrecioMullos().signum() == 0) {
+			sinTarifa.add("No hay precio de mullos configurado");
+		}
+		if (totalConAtaches > 0 && configuracion.getPrecioAtaches().signum() == 0) {
+			sinTarifa.add("No hay precio de ataches configurado");
+		}
+		if (!sinTarifa.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, String.join(". ", sinTarifa));
+		}
+
 		BigDecimal montoBlusas = usuario.getPagoPorBlusa().multiply(BigDecimal.valueOf(totalBlusas));
 		BigDecimal montoMullos = configuracion.getPrecioMullos().multiply(BigDecimal.valueOf(totalConMullos));
 		BigDecimal montoAtaches = configuracion.getPrecioAtaches().multiply(BigDecimal.valueOf(totalConAtaches));
 		BigDecimal montoTotal = montoBlusas.add(montoMullos).add(montoAtaches);
 
-		OrdenPago ordenPago = OrdenPago.builder()
+		return OrdenPago.builder()
 				.usuario(usuario)
 				.semanaInicio(semanaInicio)
 				.semanaFin(semanaFin)
@@ -78,12 +110,8 @@ public class PagoService {
 				.montoMullos(montoMullos)
 				.montoAtaches(montoAtaches)
 				.montoTotal(montoTotal)
-				.estado(EstadoPago.PAGADO)
-				.fechaPago(Instant.now())
+				.estado(EstadoPago.PENDIENTE)
 				.build();
-		ordenPago = ordenPagoRepository.save(ordenPago);
-
-		return toDto(ordenPago);
 	}
 
 	@Transactional(readOnly = true)
