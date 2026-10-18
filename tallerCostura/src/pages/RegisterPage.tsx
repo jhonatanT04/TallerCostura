@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { register } from '../api'
+import { AuthLayout } from '../components/AuthLayout'
 import { PasswordInput } from '../components/PasswordInput'
+import { Button } from '../components/ui/Button'
 
 export function RegisterPage() {
-  
   const navigate = useNavigate()
 
   const [nombreCompleto, setNombreCompleto] = useState('')
@@ -43,73 +44,64 @@ export function RegisterPage() {
   }
 
   return (
-    <main className="auth-page">
-      <form className="card" onSubmit={handleSubmit}>
-        <h1>Taller de Costura</h1>
-
-        <p className="subtitle">
-          Crea una cuenta para continuar
-        </p>
-
+    <AuthLayout
+      title="Crea tu cuenta"
+      description="La administradora debe aprobarla antes de que puedas ingresar."
+      footer={
+        <>
+          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+        </>
+      }
+    >
+      <form className="auth-form" onSubmit={handleSubmit}>
         <label>
           Nombre completo
           <input
             type="text"
             value={nombreCompleto}
             onChange={(event) => setNombreCompleto(event.target.value)}
+            autoComplete="name"
             autoFocus
             required
           />
         </label>
-
         <label>
           Usuario
           <input
             type="text"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
+            autoComplete="username"
             required
           />
         </label>
-
         <label>
           Contraseña
           <PasswordInput
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            autoComplete="new-password"
             required
           />
         </label>
-
         <label>
           Confirmar contraseña
           <PasswordInput
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
+            autoComplete="new-password"
             required
           />
         </label>
-
-        {error && <p className="error">{error}</p>}
-
-        <button
-          type="submit"
-          className="primary"
-          disabled={loading}
-        >
-          {loading ? 'Registrando…' : 'Registrarse'}
-        </button>
-
-        <button
-          type="button"
-          className="secondary"
-          onClick={() => navigate('/login')}
-          disabled={loading}
-        >
-          Ya tengo una cuenta
-        </button>
+        <Button type="submit" variant="primary" loading={loading} className="auth-submit">
+          {loading ? 'Creando cuenta…' : 'Crear cuenta'}
+        </Button>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
       </form>
-    </main>
+    </AuthLayout>
   )
 }
-

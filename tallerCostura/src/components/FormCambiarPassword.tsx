@@ -1,7 +1,10 @@
 import { useState, type FormEvent } from 'react'
+import { CheckCircleIcon, KeyIcon } from '@phosphor-icons/react'
 import { cambiarPasswordEmpleado } from '../api'
 import type { Empleado } from '../api/types'
 import { PasswordInput } from './PasswordInput'
+import { Button } from './ui/Button'
+import { ModalLayout } from './ui/ModalLayout'
 
 interface FormCambiarPasswordProps {
   empleado: Empleado
@@ -39,51 +42,47 @@ export function FormCambiarPassword({ empleado, onClose }: FormCambiarPasswordPr
     }
   }
 
-  return (
-    <div className="form-new-trabajador">
-      <h3>Cambiar contraseña de {empleado.nombreCompleto}</h3>
-      {error && <p className="error">{error}</p>}
-
-      {saved ? (
-        <section>
-          <p className="info">Contraseña actualizada.</p>
-          <button type="button" onClick={onClose}>
+  if (saved) {
+    return (
+      <ModalLayout
+        icon={CheckCircleIcon}
+        title="Contraseña actualizada"
+        description={`${empleado.nombreCompleto} ya puede iniciar sesión con la nueva contraseña.`}
+        footer={
+          <Button variant="primary" onClick={onClose}>
             Cerrar
-          </button>
-        </section>
-      ) : (
+          </Button>
+        }
+      />
+    )
+  }
+
+  return (
+    <ModalLayout
+      icon={KeyIcon}
+      title="Cambiar contraseña"
+      description={empleado.nombreCompleto}
+      onSubmit={handleSubmit}
+      footer={
         <>
-          <form onSubmit={handleSubmit}>
-            <section>
-              <label>
-                Nueva contraseña:
-                <PasswordInput
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  minLength={6}
-                  autoFocus
-                  required
-                />
-              </label>
-              <label>
-                Confirmar contraseña:
-                <PasswordInput
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  minLength={6}
-                  required
-                />
-              </label>
-              <button type="submit" className="primary" disabled={saving}>
-                {saving ? 'Guardando…' : 'Cambiar contraseña'}
-              </button>
-            </section>
-          </form>
-          <button type="button" onClick={onClose}>
+          <Button onClick={onClose} disabled={saving}>
             Cancelar
-          </button>
+          </Button>
+          <Button type="submit" variant="primary" loading={saving}>
+            {saving ? 'Guardando…' : 'Cambiar contraseña'}
+          </Button>
         </>
-      )}
-    </div>
+      }
+    >
+      <label>
+        Nueva contraseña
+        <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} autoFocus required />
+      </label>
+      <label>
+        Confirmar contraseña
+        <PasswordInput value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} minLength={6} required />
+      </label>
+      {error && <p className="error">{error}</p>}
+    </ModalLayout>
   )
 }

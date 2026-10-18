@@ -1,0 +1,943 @@
+/* ------------------------------------------------------------------
+   Botones. Los <button> sin clase y las clases antiguas .primary /
+   .danger comparten estos estilos para que lo no migrado se vea igual.
+   ------------------------------------------------------------------ */
+.btn,
+:where(button:not([class])),
+:where(button.primary),
+:where(button.danger) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-label);
+  box-shadow: var(--shadow-xs);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.btn:hover:not(:disabled),
+:where(button:not([class])):hover:not(:disabled) {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.btn:active:not(:disabled),
+:where(button:not([class])):active:not(:disabled),
+:where(button.primary):active:not(:disabled),
+:where(button.danger):active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible,
+:where(button:not([class])):focus-visible,
+:where(button.primary):focus-visible,
+:where(button.danger):focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-xs), var(--focus-ring);
+}
+
+.btn:disabled,
+:where(button:not([class])):disabled,
+:where(button.primary):disabled,
+:where(button.danger):disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: 8px 12px;
+}
+
+.btn-primary,
+:where(button.primary) {
+  border-color: var(--fg-brand);
+  background: var(--fg-brand);
+  color: var(--text-on-brand);
+}
+
+.btn-primary:hover:not(:disabled),
+:where(button.primary):hover:not(:disabled) {
+  border-color: var(--fg-brand-hover);
+  background: var(--fg-brand-hover);
+  color: var(--text-on-brand);
+}
+
+.btn-tertiary {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-secondary);
+}
+
+.btn-tertiary:hover:not(:disabled) {
+  background: var(--bg-secondary);
+}
+
+.btn-danger,
+:where(button.danger) {
+  border-color: var(--fg-danger);
+  background: var(--fg-danger);
+  color: var(--text-on-brand);
+}
+
+.btn-danger:hover:not(:disabled),
+:where(button.danger):hover:not(:disabled) {
+  border-color: var(--fg-danger-hover);
+  background: var(--fg-danger-hover);
+  color: var(--text-on-brand);
+}
+
+.btn-danger:focus-visible,
+:where(button.danger):focus-visible {
+  box-shadow: var(--shadow-xs), var(--focus-ring-error);
+}
+
+.btn-spinner {
+  animation: btn-spin 0.8s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Botón solo ícono */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.icon-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ------------------------------------------------------------------
+   Control segmentado (12 meses / 30 días / 7 días)
+   ------------------------------------------------------------------ */
+.segmented {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.segmented-option {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-tertiary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.segmented-option:hover {
+  color: var(--text-label);
+}
+
+.segmented-option.active {
+  background: var(--bg-primary-alt);
+  color: var(--text-label);
+  box-shadow: var(--shadow-xs);
+}
+
+.segmented-option:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ------------------------------------------------------------------
+   Encabezado de página
+   ------------------------------------------------------------------ */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.page-header-text {
+  min-width: 0;
+}
+
+.page-header-description {
+  margin-top: 4px;
+  color: var(--text-secondary);
+}
+
+.page-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 767px) {
+  .page-header {
+    flex-direction: column;
+    margin-bottom: 24px;
+  }
+
+  .page-header-actions {
+    width: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Card / Panel
+   ------------------------------------------------------------------ */
+.card-ui,
+.panel {
+  padding: 24px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary);
+}
+
+.card-ui-elevated {
+  box-shadow: var(--shadow-xs);
+}
+
+.card-ui-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card-ui-header h3 {
+  margin: 0;
+}
+
+.card-ui-actions {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 767px) {
+  .card-ui,
+  .panel {
+    padding: 16px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Badge
+   ------------------------------------------------------------------ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-full);
+  background: var(--bg-secondary);
+  color: var(--text-label);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.badge-brand {
+  border-color: var(--border-brand);
+  background: var(--bg-brand-subtle);
+  color: var(--text-brand);
+}
+
+.badge-success {
+  border-color: var(--badge-success-border);
+  background: var(--badge-success-bg);
+  color: var(--text-success);
+}
+
+.badge-warning {
+  border-color: var(--badge-warning-border);
+  background: var(--badge-warning-bg);
+  color: var(--text-warning);
+}
+
+.badge-error {
+  border-color: var(--badge-error-border);
+  background: var(--badge-error-bg);
+  color: var(--text-error);
+}
+
+/* ------------------------------------------------------------------
+   Skeleton
+   ------------------------------------------------------------------ */
+.skeleton {
+  display: block;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-active) 37%, var(--bg-secondary) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------
+   Tabla. El scroll horizontal queda dentro de .table-wrap.
+   ------------------------------------------------------------------ */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary);
+}
+
+.table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  padding: 0 24px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.table th {
+  height: 44px;
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.table td {
+  height: 72px;
+  color: var(--text-secondary);
+}
+
+.table-compact td {
+  height: 52px;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table td:first-child {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.empty-table {
+  text-align: center !important;
+  color: var(--text-tertiary) !important;
+  font-weight: 400 !important;
+}
+
+@media (max-width: 767px) {
+  .table th,
+  .table td {
+    padding: 0 16px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Modal
+   ------------------------------------------------------------------ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: var(--bg-overlay);
+  animation: modal-fade 0.2s ease;
+}
+
+/* El ancho va en el contenedor que hace scroll: si fuera del hijo, la barra vertical
+   le restaría espacio y aparecería un scroll horizontal. */
+.modal-content {
+  width: min(480px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary-alt);
+  box-shadow: var(--shadow-lg);
+  animation: modal-pop 0.2s ease;
+}
+
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@media (max-width: 767px) {
+  .modal-overlay {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay,
+  .modal-content {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Avatar y persona
+   ------------------------------------------------------------------ */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--bg-active);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+.avatar-md {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+.persona {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.persona-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.persona-nombre {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.persona-detalle {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* ------------------------------------------------------------------
+   Menú de acciones (⋮)
+   ------------------------------------------------------------------ */
+.action-menu {
+  display: inline-flex;
+}
+
+.action-menu-list {
+  position: fixed;
+  z-index: 250;
+  min-width: 200px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary-alt);
+  box-shadow: var(--shadow-lg);
+}
+
+.action-menu-item {
+  display: flex;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-label);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.action-menu-item:hover,
+.action-menu-item:focus-visible {
+  outline: none;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.action-menu-item.danger {
+  color: var(--text-error);
+}
+
+/* ------------------------------------------------------------------
+   Popover (bottom sheet en móvil)
+   ------------------------------------------------------------------ */
+.popover-anchor {
+  position: relative;
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 260;
+  padding: 8px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary-alt);
+  box-shadow: var(--shadow-lg);
+  animation: modal-pop 0.15s ease;
+}
+
+.popover:focus-visible {
+  outline: none;
+}
+
+.popover-overlay {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .popover-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 259;
+    background: var(--bg-overlay);
+  }
+
+  .popover {
+    position: fixed;
+    inset: auto 0 0;
+    top: auto;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    animation: sheet-up 0.2s ease;
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Filas-tarjeta (móvil) y alternancia tabla / lista
+   ------------------------------------------------------------------ */
+.row-cards {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-xl);
+  background: var(--bg-primary);
+}
+
+.row-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.row-card:last-child {
+  border-bottom: none;
+}
+
+.row-card-top,
+.row-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.row-card-title {
+  min-width: 0;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.row-card-aside {
+  flex-shrink: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.row-card-meta {
+  min-width: 0;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.row-card-footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.row-cards-empty {
+  padding: 24px 16px;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.only-desktop {
+  display: block;
+}
+
+.only-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .only-desktop {
+    display: none;
+  }
+
+  .only-mobile {
+    display: flex;
+  }
+}
+
+/* Celdas numéricas */
+.table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.table .strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.table .actions {
+  width: 1%;
+  text-align: right;
+}
+
+.table-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ------------------------------------------------------------------
+   Barra de filtros y cabecera de tarjeta con filtros
+   ------------------------------------------------------------------ */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.toolbar > label {
+  width: 280px;
+  max-width: 100%;
+}
+
+.inline-select {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.inline-select select {
+  min-height: 40px;
+  padding: 8px 12px;
+}
+
+@media (max-width: 767px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar > .segmented {
+    display: flex;
+    width: 100%;
+  }
+
+  .toolbar > .segmented .segmented-option {
+    flex: 1;
+  }
+
+  .toolbar > label,
+  .toolbar > .btn,
+  .toolbar > .popover-anchor,
+  .toolbar > .popover-anchor > .btn {
+    width: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Modal: encabezado, cuerpo y footer
+   ------------------------------------------------------------------ */
+.modal-content.modal-lg {
+  width: min(720px, 100%);
+}
+
+.modal-layout {
+  padding: 24px;
+}
+
+.modal-header {
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.modal-description {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 16px;
+  border: 8px solid var(--icon-ring-brand);
+  border-radius: var(--radius-full);
+  background: var(--icon-bg-brand);
+  color: var(--icon-fg-brand);
+  box-sizing: content-box;
+}
+
+.modal-icon-error {
+  border-color: var(--icon-ring-error);
+  background: var(--icon-bg-error);
+  color: var(--icon-fg-error);
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+@media (max-width: 767px) {
+  .modal-layout {
+    padding: 20px 16px;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .modal-footer > .btn {
+    width: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Métricas
+   ------------------------------------------------------------------ */
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metric-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.metric-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.metric-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.metric-lg .metric-value {
+  font-size: 36px;
+  line-height: 44px;
+}
+
+.metric-md .metric-value {
+  font-size: 30px;
+  line-height: 38px;
+}
+
+.metric-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-trend.up {
+  color: var(--trend-up);
+}
+
+.metric-trend.down {
+  color: var(--trend-down);
+}
+
+.metric-trend.flat {
+  color: var(--text-tertiary);
+}
+
+/* Chip de color de la prenda */
+.color-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-chip-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 1px var(--border-primary);
+}

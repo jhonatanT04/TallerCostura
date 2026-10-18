@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { AuthLayout } from '../components/AuthLayout'
 import { PasswordInput } from '../components/PasswordInput'
+import { Button } from '../components/ui/Button'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -25,7 +27,7 @@ export function LoginPage() {
       setError(
         err instanceof ApiError && err.status === 401
           ? registered
-            ? 'Usuario o contraseña incorrectos. Si acabas de crear tu cuenta, también puede ser que la jefa aún no la haya activado.'
+            ? 'Usuario o contraseña incorrectos. Si acabas de crear tu cuenta, también puede ser que la administradora aún no la haya activado.'
             : 'Usuario o contraseña incorrectos'
           : 'No se pudo iniciar sesión. Intenta de nuevo.',
       )
@@ -35,20 +37,27 @@ export function LoginPage() {
   }
 
   return (
-    <main className="auth-page">
-      <form className="card" onSubmit={handleSubmit}>
-        <h1>Taller de Costura</h1>
-        <p className="subtitle">Inicia sesión para continuar</p>
-        {registered && (
-          <p className="info">
-            Cuenta creada. Espera a que la jefa la active antes de poder iniciar sesión.
-          </p>
-        )}
+    <AuthLayout
+      title="Inicia sesión"
+      description="Ingresa con tu usuario y contraseña."
+      footer={
+        <>
+          ¿No tienes cuenta? <Link to="/register">Crea una cuenta</Link>
+        </>
+      }
+    >
+      {registered && (
+        <p className="auth-aviso" role="status">
+          Tu cuenta quedó pendiente de aprobación por la administradora. Podrás iniciar sesión cuando la active.
+        </p>
+      )}
+      <form className="auth-form" onSubmit={handleSubmit}>
         <label>
           Usuario
           <input
             value={username}
             onChange={(event) => setUsername(event.target.value)}
+            autoComplete="username"
             autoFocus
             required
           />
@@ -58,21 +67,19 @@ export function LoginPage() {
           <PasswordInput
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
             required
           />
         </label>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" className="primary" disabled={loading}>
+        <Button type="submit" variant="primary" loading={loading} className="auth-submit">
           {loading ? 'Ingresando…' : 'Ingresar'}
-        </button>
-        <button
-          type="button"
-          className="secondary"
-          onClick={() => navigate('/register')}
-        >
-          Crear una cuenta
-        </button>
+        </Button>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
       </form>
-    </main>
+    </AuthLayout>
   )
 }

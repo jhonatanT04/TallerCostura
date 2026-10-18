@@ -1,9 +1,8 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import './App.css'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import { ProtectedRoute } from './auth/ProtectedRoute'
-import { Navbar } from './components/Navbar'
-import { AdminPage } from './pages/admin/AdminPage'
+import { AppLayout } from './components/layout/AppLayout'
 import { EmpleadoPage } from './pages/EmpleadoPage'
 import { LoginPage } from './pages/LoginPage'
 import { EmpleadosPage } from './pages/admin/EmpleadosPage'
@@ -28,44 +27,45 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
       <Route path="/register" element={ user ? <Navigate to="/" replace /> : <RegisterPage /> } />
       <Route
-        path="/"
         element={
           <ProtectedRoute>
-            <HomeRedirect />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/registros"
-        element={
-          <ProtectedRoute allowedRoles={['EMPLEADO']}>
-            <EmpleadoPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/pagos"
-        element={
-          <ProtectedRoute allowedRoles={['EMPLEADO']}>
-            <MisPagosPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
-            <AdminPage />
+            <AppLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="clientes" element={<ClientesPage />} />
-        <Route path="ordenes" element={<OrdenesPage/>} />
-        <Route path="pagos" element={<PagosPage />} />
-        <Route path="registros" element={<RegistroPage/>} />
-        <Route path="empleados" element={<EmpleadosPage />} />
+        <Route path="/" element={<HomeRedirect />} />
+        <Route
+          path="/registros"
+          element={
+            <ProtectedRoute allowedRoles={['EMPLEADO']}>
+              <EmpleadoPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pagos"
+          element={
+            <ProtectedRoute allowedRoles={['EMPLEADO']}>
+              <MisPagosPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <Outlet />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="clientes" element={<ClientesPage />} />
+          <Route path="ordenes" element={<OrdenesPage />} />
+          <Route path="pagos" element={<PagosPage />} />
+          <Route path="registros" element={<RegistroPage />} />
+          <Route path="empleados" element={<EmpleadosPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -75,7 +75,6 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <Navbar />
       <AppRoutes />
     </AuthProvider>
   )

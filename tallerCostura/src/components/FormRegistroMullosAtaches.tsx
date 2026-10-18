@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { useGuardarRegistro } from '../lib/useGuardarRegistro'
 import { CamposColorTalla, type CamposColorTallaProps } from './CamposColorTalla'
+import { RegistroMensajes } from './RegistroMensajes'
+import { Button } from './ui/Button'
 
 interface FormRegistroMullosAtachesProps extends CamposColorTallaProps {
   onRegistrado: () => void
@@ -9,7 +11,7 @@ interface FormRegistroMullosAtachesProps extends CamposColorTallaProps {
 export function FormRegistroMullosAtaches({ onRegistrado, ...campos }: FormRegistroMullosAtachesProps) {
   const [cantidadMullos, setCantidadMullos] = useState(0)
   const [cantidadAtaches, setCantidadAtaches] = useState(0)
-  const { submitting, error, setError, guardar } = useGuardarRegistro(onRegistrado)
+  const { submitting, error, setError, exito, guardar } = useGuardarRegistro(onRegistrado)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -52,11 +54,11 @@ export function FormRegistroMullosAtaches({ onRegistrado, ...campos }: FormRegis
             onChange={(event) => setCantidadAtaches(Math.max(0, Number(event.target.value) || 0))}
           />
         </label>
-        <button type="submit" className="primary" disabled={submitting}>
+        <Button type="submit" variant="primary" loading={submitting} className="registro-submit">
           {submitting ? 'Guardando…' : 'Registrar'}
-        </button>
+        </Button>
       </form>
-      {error && <p className="error">{error}</p>}
+      <RegistroMensajes error={error} exito={exito} />
     </>
   )
 }

@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { crearOrden } from '../api'
 import type { Cliente } from '../api/types'
+import { PackageIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { Button } from './ui/Button'
+import { ModalLayout } from './ui/ModalLayout'
 
 interface ItemForm {
   color: string
@@ -74,78 +77,83 @@ export function FormNewOrden({ clientes, defaultClienteId, onClose, onCreate }: 
   }
 
   return (
-    <div className="form-new-trabajador">
-      <h3>Crear nueva orden</h3>
-      {createError && <p className="error">{createError}</p>}
-
-      <form onSubmit={handleSubmit}>
-        <section>
-          <label>
-            Cliente:
-            <select value={clienteId} onChange={(e) => setClienteId(e.target.value)} required>
-              <option value="" disabled>
-                Selecciona un cliente
-              </option>
-              {clientes.map((cliente) => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.nombre}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          {items.map((item, index) => (
-            <div className="orden-item-row" key={index}>
-              <label>
-                Color:
-                <input
-                  type="text"
-                  value={item.color}
-                  onChange={(e) => updateItem(index, 'color', e.target.value)}
-                  required
-                />
-              </label>
-              <label>
-                Cantidad:
-                <input
-                  type="number"
-                  min="1"
-                  value={item.cantidad}
-                  onChange={(e) => updateItem(index, 'cantidad', e.target.value)}
-                  required
-                />
-              </label>
-              <label>
-                Precio unitario:
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={item.precioUnitario}
-                  onChange={(e) => updateItem(index, 'precioUnitario', e.target.value)}
-                  required
-                />
-              </label>
-              <button
-                type="button"
-                onClick={() => removeItem(index)}
-                disabled={items.length === 1}
-              >
-                Quitar
-              </button>
-            </div>
-          ))}
-
-          <button type="button" onClick={addItem}>
-            + Agregar color
-          </button>
-
-          <button type="submit" disabled={creating}>
+    <ModalLayout
+      icon={PackageIcon}
+      title="Crear orden"
+      description="Agrupa las blusas por color, cada una con su precio."
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <Button onClick={onClose} disabled={creating}>
+            Cancelar
+          </Button>
+          <Button type="submit" variant="primary" loading={creating}>
             {creating ? 'Creando…' : 'Crear orden'}
-          </button>
-        </section>
-      </form>
-      <button onClick={onClose}>Cancelar</button>
-    </div>
+          </Button>
+        </>
+      }
+    >
+      <label>
+        Cliente
+        <select value={clienteId} onChange={(e) => setClienteId(e.target.value)} required>
+          <option value="" disabled>
+            Selecciona un cliente
+          </option>
+          {clientes.map((cliente) => (
+            <option key={cliente.id} value={cliente.id}>
+              {cliente.nombre}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {items.map((item, index) => (
+        <fieldset className="orden-item-row" key={index}>
+          <legend className="sr-only">Color {index + 1}</legend>
+          <label className="orden-item-color">
+            Color
+            <input type="text" value={item.color} onChange={(e) => updateItem(index, 'color', e.target.value)} required />
+          </label>
+          <label>
+            Cantidad
+            <input
+              type="number"
+              min="1"
+              value={item.cantidad}
+              onChange={(e) => updateItem(index, 'cantidad', e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Precio unitario
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={item.precioUnitario}
+              onChange={(e) => updateItem(index, 'precioUnitario', e.target.value)}
+              required
+            />
+          </label>
+          <Button
+            size="sm"
+            variant="tertiary"
+            icon={TrashIcon}
+            className="orden-item-quitar"
+            onClick={() => removeItem(index)}
+            disabled={items.length === 1}
+            aria-label={`Quitar color ${index + 1}`}
+          >
+            Quitar
+          </Button>
+        </fieldset>
+      ))}
+
+      <Button icon={PlusIcon} size="sm" className="orden-agregar" onClick={addItem}>
+        Agregar color
+      </Button>
+
+      {createError && <p className="error">{createError}</p>}
+    </ModalLayout>
   )
 }
