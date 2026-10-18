@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -53,5 +55,15 @@ public class GlobalExceptionHandler {
 				.map(err -> err.getField() + ": " + err.getDefaultMessage())
 				.collect(Collectors.joining(", "));
 		return ResponseEntity.badRequest().body(Map.of("message", message));
+	}
+
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	public ResponseEntity<Map<String, String>> handleMissingParam(MissingServletRequestParameterException ex) {
+		return ResponseEntity.badRequest().body(Map.of("message", "Falta el parámetro " + ex.getParameterName()));
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<Map<String, String>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+		return ResponseEntity.badRequest().body(Map.of("message", "Valor inválido para el parámetro " + ex.getName()));
 	}
 }
