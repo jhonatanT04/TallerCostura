@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { TrashIcon } from '@phosphor-icons/react'
 import { eliminarEmpleado } from '../api'
 import type { Empleado } from '../api/types'
+import { Button } from './ui/Button'
+import { ModalLayout } from './ui/ModalLayout'
 
 interface ConfirmarEliminarEmpleadoProps {
   empleado: Empleado
@@ -26,21 +29,23 @@ export function ConfirmarEliminarEmpleado({ empleado, onClose, onDelete }: Confi
   }
 
   return (
-    <div className="form-new-trabajador">
-      <h3>¿Eliminar a {empleado.nombreCompleto}?</h3>
-      <p>
-        Ya no podrá iniciar sesión y desaparecerá de la lista de empleados. Sus registros de blusas
-        y pagos se conservan. <strong>Esta acción no se puede deshacer.</strong>
-      </p>
+    <ModalLayout
+      icon={TrashIcon}
+      tone="error"
+      title={`¿Eliminar a ${empleado.nombreCompleto}?`}
+      description="Ya no podrá iniciar sesión y desaparecerá de la lista de empleados. Sus registros de blusas y pagos se conservan. Esta acción no se puede deshacer."
+      footer={
+        <>
+          <Button onClick={onClose} disabled={deleting}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={handleDelete} loading={deleting}>
+            {deleting ? 'Eliminando…' : 'Eliminar'}
+          </Button>
+        </>
+      }
+    >
       {error && <p className="error">{error}</p>}
-      <div className="confirm-actions">
-        <button type="button" onClick={onClose} disabled={deleting}>
-          Cancelar
-        </button>
-        <button type="button" className="danger" onClick={handleDelete} disabled={deleting}>
-          {deleting ? 'Eliminando…' : 'Eliminar'}
-        </button>
-      </div>
-    </div>
+    </ModalLayout>
   )
 }

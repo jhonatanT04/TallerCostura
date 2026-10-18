@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { addDays, lunesDe, parseISODate, toISODate } from '../lib/fechas'
+import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
+import { IconButton } from './ui/IconButton'
 
 const DIAS = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
 
@@ -24,21 +26,17 @@ export function SelectorSemana({ value, onChange }: SelectorSemanaProps) {
   return (
     <div className="selector-semana">
       <div className="selector-semana-header">
-        <button
-          type="button"
-          aria-label="Mes anterior"
+        <IconButton
+          icon={CaretLeftIcon}
+          label="Mes anterior"
           onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() - 1, 1))}
-        >
-          ‹
-        </button>
+        />
         <span className="selector-semana-titulo">{titulo}</span>
-        <button
-          type="button"
-          aria-label="Mes siguiente"
+        <IconButton
+          icon={CaretRightIcon}
+          label="Mes siguiente"
           onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() + 1, 1))}
-        >
-          ›
-        </button>
+        />
       </div>
 
       <div className="selector-semana-dias" aria-hidden="true">

@@ -1,3 +1,5 @@
+import { useId } from 'react'
+import { COLORES_SUGERIDOS, muestraDeColor } from '../lib/colores'
 import { TALLAS_NUMERICO } from '../lib/talla'
 
 export interface CamposColorTallaProps {
@@ -8,11 +10,28 @@ export interface CamposColorTallaProps {
 }
 
 export function CamposColorTalla({ color, talla, onColorChange, onTallaChange }: CamposColorTallaProps) {
+  const listaId = useId()
+  const muestra = muestraDeColor(color)
+
   return (
     <>
-      <label>
+      <label className="campo-color">
         Color
-        <input value={color} onChange={(event) => onColorChange(event.target.value)} required />
+        <span className={`campo-color-input${muestra ? ' con-muestra' : ''}`}>
+          {muestra && <span className="color-chip-dot" style={{ backgroundColor: muestra }} aria-hidden="true" />}
+          <input
+            value={color}
+            onChange={(event) => onColorChange(event.target.value)}
+            list={listaId}
+            autoComplete="off"
+            required
+          />
+        </span>
+        <datalist id={listaId}>
+          {COLORES_SUGERIDOS.map((nombre) => (
+            <option key={nombre} value={nombre} />
+          ))}
+        </datalist>
       </label>
       <label>
         Talla
@@ -20,13 +39,11 @@ export function CamposColorTalla({ color, talla, onColorChange, onTallaChange }:
           <option value="" disabled>
             Selecciona una talla
           </option>
-          <optgroup label="Numérico">
-            {TALLAS_NUMERICO.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </optgroup>
+          {TALLAS_NUMERICO.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
         </select>
       </label>
     </>

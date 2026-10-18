@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { CalendarBlankIcon, XIcon } from '@phosphor-icons/react'
 import {
   calcularPago,
   getEmpleados,
@@ -12,15 +13,22 @@ import {
 import { Modal } from '../../components/Modal'
 import { ResumenSemanaPago } from '../../components/ResumenSemanaPago'
 import { SelectorSemana } from '../../components/SelectorSemana'
-import { formatRangoSemana, parseISODate } from '../../lib/fechas'
+import { Persona } from '../../components/ui/Avatar'
+import { EstadoPagoBadge } from '../../components/EstadoPagoBadge'
+import { Button } from '../../components/ui/Button'
+import { Card } from '../../components/ui/Card'
+import { IconButton } from '../../components/ui/IconButton'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Popover } from '../../components/ui/Popover'
+import { RowCard } from '../../components/ui/RowCard'
+import { SkeletonRows } from '../../components/ui/Skeleton'
+import { addDays, formatRangoFechas, parseISODate } from '../../lib/fechas'
+import { formatMoney } from '../../lib/formato'
 
-function formatMoney(n: number): string {
-  return n.toFixed(2)
+function rangoSemana(lunes: string): string {
+  return formatRangoFechas(lunes, addDays(parseISODate(lunes), 6))
 }
 
-function formatFecha(iso: string | null): string {
-  return iso ? new Date(iso).toLocaleString() : '—'
-}
 
 export function PagosPage() {
   const [empleados, setEmpleados] = useState<Empleado[]>([])
@@ -33,6 +41,8 @@ export function PagosPage() {
   const [guardando, setGuardando] = useState(false)
   const [confirmarError, setConfirmarError] = useState<string | null>(null)
   const [mensaje, setMensaje] = useState<string | null>(null)
+  const [selectorAbierto, setSelectorAbierto] = useState(false)
+  const selectorRef = useRef<HTMLDivElement>(null)
 
   const [selectedEmpleadoId, setSelectedEmpleadoId] = useState<number | null>(null)
   const [pagos, setPagos] = useState<OrdenPagoDTO[]>([])
@@ -116,22 +126,17 @@ export function PagosPage() {
 
   return (
     <div className="page pagos-page">
-      <h2>Pagos</h2>
+      <PageHeader title="Pagos" description="Calcula y revisa los pagos semanales de los empleados." />
 
-      <section className="panel">
-        <h3>Calcular pago semanal</h3>
+      <Card title="Calcular pago semanal">
         {loadingEmpleados ? (
-          <p>Cargando empleados...</p>
+          <SkeletonRows rows={1} label="Cargando empleados" />
         ) : (
-          <form className="inline-form calcular-pago-form" onSubmit={handleCalcular}>
-            <div className="calcular-pago-campos">
+          <form className="calcular-pago" onSubmit={handleCalcular}>
+            <div className="toolbar">
               <label>
-                Empleado:
-                <select
-                  value={calcularEmpleadoId}
-                  onChange={(e) => setCalcularEmpleadoId(e.target.value)}
-                  required
-                >
+                Empleado
+                <select value={calcularEmpleadoId} onChange={(e) => setCalcularEmpleadoId(e.target.value)} required>
                   <option value="" disabled>
                     Selecciona un empleado
                   </option>
@@ -142,145 +147,163 @@ export function PagosPage() {
                   ))}
                 </select>
               </label>
-              {sinTarifa && (
-                <p className="aviso-previsualizacion">
-                  {empleadoSeleccionado.nombreCompleto} tiene la tarifa por blusa en $0.00. Si confeccionó blusas esta
-                  semana no se podrá calcular el pago; asígnale una tarifa en Empleados → Editar tarifa.
-                </p>
-              )}
-              <p className={`semana-elegida${semanaInicio ? '' : ' vacia'}`}>
-                {semanaInicio
-                  ? formatRangoSemana(parseISODate(semanaInicio))
-                  : 'Elige un día para seleccionar su semana'}
-              </p>
-              {calcularError && <p className="error">{calcularError}</p>}
-              {mensaje && <p className="info">{mensaje}</p>}
-              <button type="submit" className="primary" disabled={calculando}>
+
+              <div className="popover-anchor" ref={selectorRef}>
+                <Button
+                  icon={CalendarBlankIcon}
+                  className="selector-semana-boton"
+                  aria-haspopup="dialog"
+                  aria-expanded={selectorAbierto}
+                  onClick={() => setSelectorAbierto((abierto) => !abierto)}
+                >
+                  {semanaInicio ? rangoSemana(semanaInicio) : 'Elegir semana'}
+                </Button>
+                {selectorAbierto && (
+                  <Popover label="Elegir semana de pago" anchorRef={selectorRef} onClose={() => setSelectorAbierto(false)}>
+                    <SelectorSemana
+                      value={semanaInicio}
+                      onChange={(lunes) => {
+                        setSemanaInicio(lunes)
+                        setSelectorAbierto(false)
+                      }}
+                    />
+                  </Popover>
+                )}
+              </div>
+
+              <Button type="submit" variant="primary" loading={calculando}>
                 {calculando ? 'Calculando…' : 'Ver resumen'}
-              </button>
+              </Button>
             </div>
-            <div className="campo-semana">
-              <span>Semana de pago:</span>
-              <SelectorSemana value={semanaInicio} onChange={setSemanaInicio} />
-            </div>
+
+            {sinTarifa && (
+              <p className="aviso-previsualizacion">
+                {empleadoSeleccionado.nombreCompleto} tiene la tarifa por blusa en $0.00. Si confeccionó blusas esta
+                semana no se podrá calcular el pago; asígnale una tarifa en Empleados → Editar tarifa.
+              </p>
+            )}
+            {calcularError && <p className="error">{calcularError}</p>}
+            {mensaje && <p className="info">{mensaje}</p>}
           </form>
         )}
-      </section>
+      </Card>
 
-      <section className="panel">
-        <h3>Historial de pagos</h3>
-
-        {loadingEmpleados ? null : (
-          <ul className="select-registros">
-            <li
-              onClick={() => setSelectedEmpleadoId(null)}
-              className={`opcion-select${selectedEmpleadoId === null ? ' selected' : ''}`}
-            >
-              Todos los empleados
-            </li>
-            {empleados.map((empleado) => (
-              <li
-                key={empleado.id}
-                onClick={() => setSelectedEmpleadoId(empleado.id)}
-                className={`opcion-select${selectedEmpleadoId === empleado.id ? ' selected' : ''}`}
+      <Card
+        title="Historial de pagos"
+        className="pagos-historial"
+        actions={
+          !loadingEmpleados && (
+            <label className="inline-select">
+              Empleado
+              <select
+                value={selectedEmpleadoId ?? ''}
+                onChange={(e) => setSelectedEmpleadoId(e.target.value ? Number(e.target.value) : null)}
               >
-                {empleado.nombreCompleto}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <br />
-
+                <option value="">Todos</option>
+                {empleados.map((empleado) => (
+                  <option key={empleado.id} value={empleado.id}>
+                    {empleado.nombreCompleto}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )
+        }
+      >
         {pagosError && <p className="error">{pagosError}</p>}
 
-        <div className="table-wrap">
-          {loadingPagos ? (
-            <p>Cargando pagos...</p>
-          ) : (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Empleado</th>
-                  <th>Semana</th>
-                  <th>Blusas</th>
-                  <th>Mullos puestos</th>
-                  <th>Ataches puestos</th>
-                  <th>Monto blusas</th>
-                  <th>Monto mullos</th>
-                  <th>Monto ataches</th>
-                  <th>Total</th>
-                  <th>Fecha de pago</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {pagos.map((pago) => (
-                  <tr key={pago.id}>
-                    <td>{pago.empleado.nombreCompleto}</td>
-                    <td>
-                      {pago.semanaInicio} — {pago.semanaFin}
-                    </td>
-                    <td>{pago.totalBlusas}</td>
-                    <td>{pago.totalConMullos}</td>
-                    <td>{pago.totalConAtaches}</td>
-                    <td>${formatMoney(pago.montoBlusas)}</td>
-                    <td>${formatMoney(pago.montoMullos)}</td>
-                    <td>${formatMoney(pago.montoAtaches)}</td>
-                    <td>${formatMoney(pago.montoTotal)}</td>
-                    <td>{formatFecha(pago.fechaPago)}</td>
-                    <td>
-                      <button type="button" onClick={() => setPagoResumen(pago)}>
-                        Ver resumen
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-
-                {pagos.length === 0 && (
+        {loadingPagos ? (
+          <SkeletonRows label="Cargando pagos" />
+        ) : (
+          <>
+            <div className="table-wrap only-desktop">
+              <table className="table table-compact">
+                <thead>
                   <tr>
-                    <td colSpan={11} className="empty-table">
-                      No hay pagos calculados todavía.
-                    </td>
+                    <th>Empleado</th>
+                    <th>Semana</th>
+                    <th className="num">Blusas</th>
+                    <th className="num">Mullos</th>
+                    <th className="num">Ataches</th>
+                    <th className="num">Total</th>
+                    <th>Estado</th>
+                    <th className="actions">
+                      <span className="sr-only">Acciones</span>
+                    </th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
+                </thead>
+                <tbody>
+                  {pagos.map((pago) => (
+                    <tr key={pago.id}>
+                      <td>
+                        <Persona nombre={pago.empleado.nombreCompleto} />
+                      </td>
+                      <td>{rangoSemana(pago.semanaInicio)}</td>
+                      <td className="num">{pago.totalBlusas}</td>
+                      <td className="num">{pago.totalConMullos}</td>
+                      <td className="num">{pago.totalConAtaches}</td>
+                      <td className="num strong">{formatMoney(pago.montoTotal)}</td>
+                      <td>
+                        <EstadoPagoBadge pago={pago} />
+                      </td>
+                      <td className="actions">
+                        <Button variant="tertiary" size="sm" onClick={() => setPagoResumen(pago)}>
+                          Ver resumen
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {pagos.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="empty-table">
+                        No hay pagos calculados todavía.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <ul className="row-cards only-mobile">
+              {pagos.map((pago) => (
+                <RowCard
+                  key={pago.id}
+                  title={<Persona nombre={pago.empleado.nombreCompleto} />}
+                  aside={formatMoney(pago.montoTotal)}
+                  meta={rangoSemana(pago.semanaInicio)}
+                  footer={<EstadoPagoBadge pago={pago} />}
+                >
+                  <Button variant="secondary" size="sm" onClick={() => setPagoResumen(pago)}>
+                    Ver resumen
+                  </Button>
+                </RowCard>
+              ))}
+              {pagos.length === 0 && <li className="row-cards-empty">No hay pagos calculados todavía.</li>}
+            </ul>
+          </>
+        )}
+      </Card>
 
       {pagoResumen && (
-        <Modal onClose={cerrarResumen}>
+        <Modal onClose={cerrarResumen} label="Resumen de la semana" size="lg">
           <div className="resumen-modal">
-            <div className="panel-header">
+            <div className="resumen-modal-header">
               <h3>Resumen de la semana</h3>
-              <button type="button" onClick={cerrarResumen} disabled={guardando}>
-                Cerrar
-              </button>
+              <IconButton icon={XIcon} label="Cerrar" onClick={cerrarResumen} disabled={guardando} />
             </div>
-            {esPrevisualizacion && (
-              <p className="aviso-previsualizacion">Este pago todavía no está guardado.</p>
-            )}
-            <ResumenSemanaPago
-              key={`${pagoResumen.empleado.id}-${pagoResumen.semanaInicio}`}
-              pago={pagoResumen}
-            />
+            {esPrevisualizacion && <p className="aviso-previsualizacion">Este pago todavía no está guardado.</p>}
+            <ResumenSemanaPago key={`${pagoResumen.empleado.id}-${pagoResumen.semanaInicio}`} pago={pagoResumen} />
             {esPrevisualizacion && (
               <>
                 {confirmarError && <p className="error">{confirmarError}</p>}
-                <div className="confirm-actions">
-                  <button type="button" onClick={cerrarResumen} disabled={guardando}>
+                <div className="modal-footer">
+                  <Button onClick={cerrarResumen} disabled={guardando}>
                     Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    className="primary"
-                    onClick={handleConfirmar}
-                    disabled={guardando}
-                  >
+                  </Button>
+                  <Button variant="primary" onClick={handleConfirmar} loading={guardando}>
                     {guardando ? 'Guardando…' : 'Confirmar pago'}
-                  </button>
+                  </Button>
                 </div>
               </>
             )}

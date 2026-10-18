@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react'
 import { getRegistrosDate } from '../api'
 import type { OrdenPagoDTO, RegistroDTO } from '../api/types'
 import { addDays, formatDiaCorto, formatRangoSemana, parseISODate, toISODate } from '../lib/fechas'
-
-function formatMoney(n: number): string {
-  return n.toFixed(2)
-}
+import { SkeletonRows } from './ui/Skeleton'
+import { cantidadesDe, formatCantidades, formatMoney } from '../lib/formato'
 
 function capitalizar(texto: string): string {
   return texto.charAt(0).toUpperCase() + texto.slice(1)
@@ -24,21 +22,28 @@ function sumar(registros: RegistroDTO[]) {
 
 interface ResumenSemanaPagoProps {
   pago: OrdenPagoDTO
+  // Por defecto usa /registros/getForDate (solo ADMIN). La vista de la empleada pasa su propia carga.
+  cargarRegistros?: (pago: OrdenPagoDTO) => Promise<RegistroDTO[]>
+}
+
+function cargarComoAdmin(pago: OrdenPagoDTO): Promise<RegistroDTO[]> {
+  return getRegistrosDate(pago.semanaInicio, pago.semanaFin, pago.empleado.id)
 }
 
 // El padre debe montarlo con una key por empleado + semana para que la carga se reinicie por pago
 // (en una previsualización pago.id es null).
-export function ResumenSemanaPago({ pago }: ResumenSemanaPagoProps) {
+export function ResumenSemanaPago({ pago, cargarRegistros = cargarComoAdmin }: ResumenSemanaPagoProps) {
   const [registros, setRegistros] = useState<RegistroDTO[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // pago y cargarRegistros son estables mientras el modal está abierto; el padre lo remonta (key) al cambiar de pago.
   useEffect(() => {
-    getRegistrosDate(pago.semanaInicio, pago.semanaFin, pago.empleado.id)
+    cargarRegistros(pago)
       .then(setRegistros)
       .catch(() => setError('No se pudieron cargar los registros de la semana.'))
       .finally(() => setLoading(false))
-  }, [pago.semanaInicio, pago.semanaFin, pago.empleado.id])
+  }, [pago, cargarRegistros])
 
   const lunes = parseISODate(pago.semanaInicio)
   const dias = Array.from({ length: 7 }, (_, i) => addDays(lunes, i))
@@ -69,18 +74,18 @@ export function ResumenSemanaPago({ pago }: ResumenSemanaPagoProps) {
           <div key={t.label} className="resumen-total">
             <span className="resumen-total-label">{t.label}</span>
             <strong className="resumen-total-cantidad">{t.cantidad}</strong>
-            <span className="muted">${formatMoney(t.monto)}</span>
+            <span className="muted">{formatMoney(t.monto)}</span>
           </div>
         ))}
         <div className="resumen-total resumen-total-pagar">
           <span className="resumen-total-label">Total a pagar</span>
-          <strong className="resumen-total-cantidad">${formatMoney(pago.montoTotal)}</strong>
+          <strong className="resumen-total-cantidad">{formatMoney(pago.montoTotal)}</strong>
         </div>
       </div>
 
       <h4>Detalle por día</h4>
       {loading ? (
-        <p>Cargando registros…</p>
+        <SkeletonRows rows={3} label="Cargando registros" />
       ) : error ? (
         <p className="error">{error}</p>
       ) : (
@@ -101,11 +106,7 @@ function DiaResumen({ titulo, registros }: { titulo: string; registros: Registro
     <section className="resumen-dia">
       <div className="resumen-dia-header">
         <strong>{titulo}</strong>
-        {registros.length > 0 && (
-          <span className="muted">
-            {subtotal.confeccion} conf. · {subtotal.mullos} mullos · {subtotal.ataches} ataches
-          </span>
-        )}
+        {registros.length > 1 && <span className="muted">{formatCantidades(subtotal)}</span>}
       </div>
       {registros.length === 0 ? (
         <p className="muted">Sin registros</p>
@@ -116,9 +117,7 @@ function DiaResumen({ titulo, registros }: { titulo: string; registros: Registro
               <span>
                 {r.color} · {r.talla}
               </span>
-              <span>
-                {r.cantidadConfeccion} conf. · {r.cantidadMullos} mullos · {r.cantidadAtaches} ataches
-              </span>
+              <span>{formatCantidades(cantidadesDe(r))}</span>
             </li>
           ))}
         </ul>

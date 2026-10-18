@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { useGuardarRegistro } from '../lib/useGuardarRegistro'
 import { CamposColorTalla, type CamposColorTallaProps } from './CamposColorTalla'
+import { RegistroMensajes } from './RegistroMensajes'
+import { Button } from './ui/Button'
 
 interface FormRegistroConfeccionProps extends CamposColorTallaProps {
   onRegistrado: () => void
@@ -8,7 +10,7 @@ interface FormRegistroConfeccionProps extends CamposColorTallaProps {
 
 export function FormRegistroConfeccion({ onRegistrado, ...campos }: FormRegistroConfeccionProps) {
   const [cantidadConfeccion, setCantidadConfeccion] = useState(1)
-  const { submitting, error, setError, guardar } = useGuardarRegistro(onRegistrado)
+  const { submitting, error, setError, exito, guardar } = useGuardarRegistro(onRegistrado)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -40,11 +42,11 @@ export function FormRegistroConfeccion({ onRegistrado, ...campos }: FormRegistro
             required
           />
         </label>
-        <button type="submit" className="primary" disabled={submitting}>
+        <Button type="submit" variant="primary" loading={submitting} className="registro-submit">
           {submitting ? 'Guardando…' : 'Registrar'}
-        </button>
+        </Button>
       </form>
-      {error && <p className="error">{error}</p>}
+      <RegistroMensajes error={error} exito={exito} />
     </>
   )
 }

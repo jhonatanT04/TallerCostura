@@ -1,53 +1,261 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import '@fontsource-variable/inter';
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+/* ------------------------------------------------------------------
+   Tokens (estilo Untitled UI). Las páginas usan los tokens semánticos
+   (--bg-*, --text-*, --border-*); la escala cruda solo se usa aquí.
+   ------------------------------------------------------------------ */
+:root {
+  /* Grises neutros */
+  --gray-25: #fcfcfd;
+  --gray-50: #f9fafb;
+  --gray-100: #f2f4f7;
+  --gray-200: #eaecf0;
+  --gray-300: #d0d5dd;
+  --gray-400: #98a2b3;
+  --gray-500: #667085;
+  --gray-600: #475467;
+  --gray-700: #344054;
+  --gray-800: #182230;
+  --gray-900: #101828;
+  --gray-950: #0c111d;
+
+  /* Marca */
+  --brand-25: #fcfaff;
+  --brand-50: #f9f5ff;
+  --brand-100: #f4ebff;
+  --brand-200: #e9d7fe;
+  --brand-300: #d6bbfb;
+  --brand-400: #b692f6;
+  --brand-500: #9e77ed;
+  --brand-600: #7f56d9;
+  --brand-700: #6941c6;
+
+  /* Estado */
+  --success-50: #ecfdf3;
+  --success-200: #abefc6;
+  --success-600: #079455;
+  --success-700: #067647;
+  --warning-50: #fffaeb;
+  --warning-200: #fedf89;
+  --warning-600: #dc6803;
+  --warning-700: #b54708;
+  --error-50: #fef3f2;
+  --error-200: #fecdca;
+  --error-600: #d92d20;
+  --error-700: #b42318;
+
+  /* Semánticos: fondos */
+  --bg-primary: #fff;
+  --bg-primary-alt: #fff;
+  --bg-secondary: var(--gray-50);
+  --bg-active: var(--gray-100);
+  --bg-brand-subtle: var(--brand-50);
+  --bg-overlay: rgba(12, 17, 29, 0.7);
+
+  /* Semánticos: texto */
+  --text-primary: var(--gray-900);
+  --text-label: var(--gray-700);
+  --text-secondary: var(--gray-600);
+  --text-tertiary: var(--gray-500);
+  --text-placeholder: var(--gray-500);
+  --text-brand: var(--brand-700);
+  --text-on-brand: #fff;
+  --text-success: var(--success-700);
+  --text-warning: var(--warning-700);
+  --text-error: var(--error-600);
+  --trend-up: var(--success-600);
+  --trend-down: var(--error-600);
+
+  /* Semánticos: bordes y relleno de marca */
+  --border-primary: var(--gray-300);
+  --border-secondary: var(--gray-200);
+  --border-brand: var(--brand-300);
+  --fg-brand: var(--brand-600);
+  --fg-brand-hover: var(--brand-700);
+  --fg-danger: var(--error-600);
+  --fg-danger-hover: var(--error-700);
+
+  /* Insignias de estado */
+  --badge-success-bg: var(--success-50);
+  --badge-success-border: var(--success-200);
+  --badge-warning-bg: var(--warning-50);
+  --badge-warning-border: var(--warning-200);
+  --badge-error-bg: var(--error-50);
+  --badge-error-border: var(--error-200);
+
+  /* Íconos destacados de modales */
+  --icon-ring-brand: var(--brand-25);
+  --icon-bg-brand: var(--brand-100);
+  --icon-fg-brand: var(--brand-600);
+  --icon-ring-error: var(--error-50);
+  --icon-bg-error: var(--error-200);
+  --icon-fg-error: var(--error-600);
+
+  /* Radios */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Sombras */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, 0.08), 0 4px 6px -2px rgba(16, 24, 40, 0.03);
+  --focus-ring: 0 0 0 4px rgba(158, 119, 237, 0.24);
+  --focus-ring-error: 0 0 0 4px rgba(240, 68, 56, 0.24);
+
+  /* Gráficos: una sola serie en color de marca (validado claro/oscuro), ejes y grid en grises */
+  --chart-surface: var(--bg-primary);
+  --chart-text-secondary: var(--gray-600);
+  --chart-text-muted: var(--gray-500);
+  --chart-grid: var(--gray-100);
+  --chart-baseline: var(--gray-200);
+  --chart-track: var(--gray-100);
+  --chart-series-1: var(--brand-600);
+
+  --sans: 'Inter Variable', system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  font: 16px/1.5 var(--sans);
+  font-feature-settings: 'cv11';
   color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  color: var(--text-secondary);
+  background: var(--bg-primary);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+/* Modo oscuro: sigue al sistema salvo que se fuerce claro con <html data-theme="light">;
+   <html data-theme="dark"> lo fuerza aunque el sistema esté en claro (útil para revisar). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg-primary: #0c111d;
+    --bg-primary-alt: #161b26;
+    --bg-secondary: #161b26;
+    --bg-active: #1f242f;
+    --bg-brand-subtle: rgba(127, 86, 217, 0.16);
+    --bg-overlay: rgba(12, 17, 29, 0.8);
+
+    --text-primary: #f5f5f6;
+    --text-label: #cecfd2;
+    --text-secondary: #94969c;
+    --text-tertiary: #85888e;
+    --text-placeholder: #85888e;
+    --text-brand: #d6bbfb;
+    --text-success: #47cd89;
+    --text-warning: #fdb022;
+    --text-error: #f97066;
+    --trend-up: #47cd89;
+    --trend-down: #f97066;
+
+    --border-primary: #333741;
+    --border-secondary: #1f242f;
+    --border-brand: rgba(158, 119, 237, 0.5);
+    --fg-brand: var(--brand-600);
+    --fg-brand-hover: var(--brand-500);
+    --fg-danger: #d92d20;
+    --fg-danger-hover: #f04438;
+
+    --badge-success-bg: rgba(7, 148, 85, 0.16);
+    --badge-success-border: rgba(71, 205, 137, 0.4);
+    --badge-warning-bg: rgba(220, 104, 3, 0.16);
+    --badge-warning-border: rgba(253, 176, 34, 0.4);
+    --badge-error-bg: rgba(217, 45, 32, 0.16);
+    --badge-error-border: rgba(249, 112, 102, 0.4);
+
+    --icon-ring-brand: rgba(127, 86, 217, 0.08);
+    --icon-bg-brand: rgba(127, 86, 217, 0.16);
+    --icon-fg-brand: var(--brand-400);
+    --icon-ring-error: rgba(217, 45, 32, 0.08);
+    --icon-bg-error: rgba(217, 45, 32, 0.16);
+    --icon-fg-error: #f97066;
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 12px 16px -4px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+    --focus-ring: 0 0 0 4px rgba(158, 119, 237, 0.32);
+
+    --chart-text-secondary: #94969c;
+    --chart-text-muted: #85888e;
+    --chart-grid: #1f242f;
+    --chart-baseline: #333741;
+    --chart-track: #1f242f;
+    --chart-series-1: var(--brand-500);
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+:root[data-theme='light'] {
+  color-scheme: light;
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-primary: #0c111d;
+  --bg-primary-alt: #161b26;
+  --bg-secondary: #161b26;
+  --bg-active: #1f242f;
+  --bg-brand-subtle: rgba(127, 86, 217, 0.16);
+  --bg-overlay: rgba(12, 17, 29, 0.8);
+
+  --text-primary: #f5f5f6;
+  --text-label: #cecfd2;
+  --text-secondary: #94969c;
+  --text-tertiary: #85888e;
+  --text-placeholder: #85888e;
+  --text-brand: #d6bbfb;
+  --text-success: #47cd89;
+  --text-warning: #fdb022;
+  --text-error: #f97066;
+  --trend-up: #47cd89;
+  --trend-down: #f97066;
+
+  --border-primary: #333741;
+  --border-secondary: #1f242f;
+  --border-brand: rgba(158, 119, 237, 0.5);
+  --fg-brand: var(--brand-600);
+  --fg-brand-hover: var(--brand-500);
+  --fg-danger: #d92d20;
+  --fg-danger-hover: #f04438;
+
+  --badge-success-bg: rgba(7, 148, 85, 0.16);
+  --badge-success-border: rgba(71, 205, 137, 0.4);
+  --badge-warning-bg: rgba(220, 104, 3, 0.16);
+  --badge-warning-border: rgba(253, 176, 34, 0.4);
+  --badge-error-bg: rgba(217, 45, 32, 0.16);
+  --badge-error-border: rgba(249, 112, 102, 0.4);
+
+  --icon-ring-brand: rgba(127, 86, 217, 0.08);
+  --icon-bg-brand: rgba(127, 86, 217, 0.16);
+  --icon-fg-brand: var(--brand-400);
+  --icon-ring-error: rgba(217, 45, 32, 0.08);
+  --icon-bg-error: rgba(217, 45, 32, 0.16);
+  --icon-fg-error: #f97066;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 16px -4px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+  --focus-ring: 0 0 0 4px rgba(158, 119, 237, 0.32);
+
+  --chart-text-secondary: #94969c;
+  --chart-text-muted: #85888e;
+  --chart-grid: #1f242f;
+  --chart-baseline: #333741;
+  --chart-track: #1f242f;
+  --chart-series-1: var(--brand-500);
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-primary);
 }
 
 #root {
@@ -56,50 +264,177 @@
   flex-direction: column;
 }
 
-body {
-  margin: 0;
-}
-
 h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+h2,
+h3,
+h4 {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  font-size: 30px;
+  line-height: 38px;
+  letter-spacing: -0.02em;
+  margin: 0;
 }
+
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
+  font-size: 20px;
+  line-height: 30px;
+  letter-spacing: -0.01em;
   margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+}
+
+h3 {
+  font-size: 18px;
+  line-height: 28px;
+  margin: 0 0 8px;
+}
+
+h4 {
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0 0 4px;
+}
+
+@media (max-width: 1023px) {
+  h1 {
+    font-size: 24px;
+    line-height: 32px;
   }
 }
+
 p {
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+a {
+  color: var(--text-brand);
 }
 
 code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------------
+   Controles de formulario globales
+   ------------------------------------------------------------------ */
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--text-label);
+}
+
+input:not([type='checkbox'], [type='radio']),
+select,
+textarea {
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-placeholder);
+}
+
+input:not([type='checkbox'], [type='radio']):focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--brand-300);
+  box-shadow: var(--shadow-xs), var(--focus-ring);
+}
+
+input[aria-invalid='true'],
+select[aria-invalid='true'] {
+  border-color: var(--error-600);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--fg-brand);
+}
+
+.checkbox-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Mensajes */
+.error {
+  color: var(--text-error);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.info {
+  color: var(--text-success);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.muted {
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.empty {
+  color: var(--text-tertiary);
+}
+
+/* Focus visible para cualquier elemento interactivo que no defina el suyo */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

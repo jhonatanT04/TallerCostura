@@ -1,6 +1,10 @@
 import { useState, type FormEvent } from 'react'
+import { CurrencyDollarIcon } from '@phosphor-icons/react'
 import { actualizarPagoEmpleado, mensajeDeError } from '../api'
 import type { Empleado } from '../api/types'
+import { formatMoney } from '../lib/formato'
+import { Button } from './ui/Button'
+import { ModalLayout } from './ui/ModalLayout'
 
 const TARIFA_INVALIDA = 'La tarifa por blusa debe ser mayor a 0'
 
@@ -36,34 +40,39 @@ export function FormEditarPago({ empleado, onClose, onUpdate }: FormEditarPagoPr
   }
 
   return (
-    <div className="form-new-trabajador">
-      <h3>Tarifa de {empleado.nombreCompleto}</h3>
-      <p className="tarifa-actual">
-        Tarifa actual: <strong>${empleado.pagoPorBlusa.toFixed(2)}</strong> por blusa
-      </p>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <section>
-          <label>
-            Nueva tarifa por blusa:
-            <input
-              type="number"
-              min="0.01"
-              step="0.01"
-              value={pagoPorBlusa}
-              onChange={(e) => setPagoPorBlusa(e.target.value)}
-              autoFocus
-              required
-            />
-          </label>
-          <button type="submit" disabled={saving}>
+    <ModalLayout
+      icon={CurrencyDollarIcon}
+      title="Editar tarifa"
+      description={empleado.nombreCompleto}
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <Button onClick={onClose} disabled={saving}>
+            Cancelar
+          </Button>
+          <Button type="submit" variant="primary" loading={saving}>
             {saving ? 'Guardando…' : 'Guardar'}
-          </button>
-        </section>
-      </form>
-      <button type="button" onClick={onClose}>
-        Cancelar
-      </button>
-    </div>
+          </Button>
+        </>
+      }
+    >
+      <p className="tarifa-actual">
+        Tarifa actual: <strong>{formatMoney(empleado.pagoPorBlusa)}</strong> por blusa
+      </p>
+      <label>
+        Nueva tarifa por blusa
+        <input
+          type="number"
+          min="0.01"
+          step="0.01"
+          value={pagoPorBlusa}
+          onChange={(e) => setPagoPorBlusa(e.target.value)}
+          aria-invalid={error ? true : undefined}
+          autoFocus
+          required
+        />
+      </label>
+      {error && <p className="error">{error}</p>}
+    </ModalLayout>
   )
 }

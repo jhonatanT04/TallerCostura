@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react'
+import { AddressBookIcon } from '@phosphor-icons/react'
 import { crearCliente } from '../api'
+import { Button } from './ui/Button'
+import { ModalLayout } from './ui/ModalLayout'
 
 interface FormNewClienteProps {
   onClose: () => void
@@ -30,42 +33,30 @@ export function FormNewCliente({ onClose, onCreate }: FormNewClienteProps) {
   }
 
   return (
-    <div className="form-new-trabajador">
-      <h3>Crear nuevo cliente</h3>
+    <ModalLayout
+      icon={AddressBookIcon}
+      title="Crear cliente"
+      onSubmit={handleCreate}
+      footer={
+        <>
+          <Button onClick={onClose} disabled={creating}>
+            Cancelar
+          </Button>
+          <Button type="submit" variant="primary" loading={creating}>
+            Crear cliente
+          </Button>
+        </>
+      }
+    >
+      <label>
+        Nombre
+        <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} autoFocus required />
+      </label>
+      <label>
+        Teléfono (opcional)
+        <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+      </label>
       {createError && <p className="error">{createError}</p>}
-      {creating && <p className="error">Creando cliente...</p>}
-
-      {!creating && !createError && (
-        <section>
-          <form onSubmit={handleCreate}>
-            <section>
-              <label>
-                Nombre:
-                <input
-                  type="text"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  autoFocus
-                  required
-                />
-              </label>
-              <label>
-                Teléfono:
-                <input
-                  type="text"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                />
-              </label>
-              <button type="submit" disabled={creating}>
-                {' '}
-                Crear{' '}
-              </button>
-            </section>
-          </form>
-          <button onClick={onClose}>Cancelar</button>
-        </section>
-      )}
-    </div>
+    </ModalLayout>
   )
 }

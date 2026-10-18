@@ -1,11 +1,14 @@
 import { useEffect, type ReactNode } from 'react'
+import './ui/ui.css'
 
 interface ModalProps {
   onClose: () => void
   children: ReactNode
+  label?: string
+  size?: 'md' | 'lg'
 }
 
-export function Modal({ onClose, children }: ModalProps) {
+export function Modal({ onClose, children, label, size = 'md' }: ModalProps) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') onClose()
@@ -16,7 +19,13 @@ export function Modal({ onClose, children }: ModalProps) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(event) => event.stopPropagation()}>
+      <div
+        className={`modal-content modal-${size}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
+        onClick={(event) => event.stopPropagation()}
+      >
         {children}
       </div>
     </div>
