@@ -911,6 +911,11 @@ label {
   overflow-y: auto;
 }
 
+.tarifa-actual {
+  margin: 0 0 12px;
+  color: var(--text-h);
+}
+
 .modal-content .form-new-trabajador {
   margin: 0;
 }
@@ -1118,4 +1123,284 @@ button.danger {
   background: #d03b3b;
   border-color: #d03b3b;
   color: #fff;
+}
+
+/* Formulario de calcular pago: una columna en móvil, dos (campos | calendario) desde 768px */
+.calcular-pago-campos {
+  /* En móvil sus hijos participan directo en el flex del form para poder reordenarse. */
+  display: contents;
+}
+
+.calcular-pago-form .campo-semana {
+  order: 1;
+}
+
+.calcular-pago-campos > :is(.semana-elegida, .error, .info, button) {
+  order: 2;
+}
+
+@media (min-width: 768px) {
+  .calcular-pago-form {
+    display: grid;
+    grid-template-columns: minmax(260px, 420px) minmax(340px, 380px);
+    align-items: start;
+    justify-content: start;
+    gap: 24px;
+  }
+
+  .calcular-pago-campos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .calcular-pago-campos > button {
+    align-self: flex-start;
+  }
+}
+
+.semana-elegida {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--accent-border);
+  border-radius: 10px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.semana-elegida.vacia {
+  border-style: dashed;
+  border-color: var(--border);
+  background: transparent;
+  font-weight: 400;
+}
+
+/* Selector de semana */
+.campo-semana {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.selector-semana {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.selector-semana-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.selector-semana-header button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.selector-semana-titulo {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.selector-semana-dias,
+.selector-semana-fila {
+  display: grid;
+  /* minmax(0, …) evita que el contenido de los botones ensanche la grilla en pantallas angostas. */
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.selector-semana-dias span {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.7;
+  padding: 4px 0;
+}
+
+.selector-semana-fila {
+  border-radius: 999px;
+  margin: 2px 0;
+}
+
+.selector-semana-fila:hover {
+  background: var(--social-bg);
+}
+
+.selector-semana-fila.selected {
+  background: var(--accent-bg);
+  box-shadow: inset 0 0 0 1px var(--accent-border);
+}
+
+.selector-semana-dia {
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-h);
+}
+
+.selector-semana-dia.fuera-de-mes {
+  opacity: 0.4;
+}
+
+.selector-semana-dia.hoy {
+  box-shadow: inset 0 0 0 1.5px var(--accent-border);
+}
+
+.selector-semana-fila.selected .selector-semana-dia {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .selector-semana-dia {
+    height: 44px;
+  }
+}
+
+/* Resumen de la semana (pagos) */
+.resumen-modal {
+  /* El overlay del modal tiene 24px de padding por lado. */
+  width: min(720px, calc(100vw - 48px));
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--bg);
+  box-sizing: border-box;
+}
+
+.resumen-modal > .panel-header {
+  /* Mantiene "Cerrar" a la vista mientras se hace scroll dentro del modal. */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: -20px -20px 12px;
+  padding: 20px 20px 12px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.aviso-previsualizacion {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #e0a43a;
+  border-radius: 8px;
+  background: rgba(224, 164, 58, 0.12);
+  color: var(--text-h);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.resumen-semana h4 {
+  margin: 16px 0 8px;
+  color: var(--text-h);
+}
+
+.resumen-semana-header h4 {
+  margin: 0;
+}
+
+.resumen-semana-header p {
+  margin: 2px 0 0;
+}
+
+.resumen-totales {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.resumen-total {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.resumen-total-label {
+  font-size: 13px;
+}
+
+.resumen-total-cantidad {
+  font-size: 22px;
+  color: var(--text-h);
+}
+
+.resumen-total-pagar {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.resumen-total-pagar .resumen-total-cantidad {
+  color: var(--accent);
+}
+
+.resumen-dias {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resumen-dia {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.resumen-dia p {
+  margin: 4px 0 0;
+}
+
+.resumen-dia-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.resumen-dia-lista {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+.resumen-dia-lista li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  padding: 4px 0;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .resumen-totales {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resumen-modal {
+    padding: 16px;
+  }
+
+  .resumen-modal > .panel-header {
+    top: 0;
+    margin: -16px -16px 12px;
+    padding: 16px 16px 12px;
+  }
 }

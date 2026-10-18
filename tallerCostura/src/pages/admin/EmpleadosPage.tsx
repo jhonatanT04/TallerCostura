@@ -96,11 +96,13 @@ export function EmpleadosPage() {
             )}
 
             {editingEmpleado && (
-                <FormEditarPago
-                    empleado={editingEmpleado}
-                    onClose={() => setEditingEmpleado(null)}
-                    onUpdate={loadEmpleados}
-                />
+                <Modal onClose={() => setEditingEmpleado(null)}>
+                    <FormEditarPago
+                        empleado={editingEmpleado}
+                        onClose={() => setEditingEmpleado(null)}
+                        onUpdate={loadEmpleados}
+                    />
+                </Modal>
             )}
 
             {passwordEmpleado && (
@@ -138,7 +140,6 @@ export function EmpleadosPage() {
                         <li key={empleado.id} className="empleado-item">
                             <span className="empleado-name">
                                 {empleado.nombreCompleto}
-                                <span className="muted">${empleado.pagoPorBlusa.toFixed(2)} / blusa</span>
                                 {!empleado.activo && <span className="badge-pendiente">Pendiente</span>}
                             </span>
 

@@ -14,7 +14,7 @@ import type {
   RegistroDTO,
 } from './types'
 
-export { ApiError } from './client'
+export { ApiError, mensajeDeError } from './client'
 export type {
   AuthUser,
   CalcularPagoInput,
@@ -164,6 +164,11 @@ export function actualizarConfiguracionPago(
     method: 'PUT',
     body: JSON.stringify(data),
   })
+}
+
+export function previsualizarPago(empleadoId: number, semanaInicio: string): Promise<OrdenPagoDTO> {
+  const params = new URLSearchParams({ empleadoId: String(empleadoId), semanaInicio })
+  return apiFetch<OrdenPagoDTO>(`/pagos/previsualizar?${params}`)
 }
 
 export function calcularPago(data: CalcularPagoInput): Promise<OrdenPagoDTO> {
