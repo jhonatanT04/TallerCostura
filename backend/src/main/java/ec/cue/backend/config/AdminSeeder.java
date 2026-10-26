@@ -11,10 +11,6 @@ import ec.cue.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Las cuentas de empleados las crea la jefa, no hay auto-registro, así que si no existe ninguna
- * cuenta ADMIN al arrancar, se siembra una por defecto para poder acceder por primera vez.
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j

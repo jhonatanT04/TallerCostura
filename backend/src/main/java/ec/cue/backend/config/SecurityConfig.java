@@ -46,8 +46,6 @@ public class SecurityConfig {
 		return new org.springframework.security.authentication.ProviderManager(provider);
 	}
 
-	// El navegador no puede mandar el JWT al abrir una página, así que la documentación usa HTTP
-	// Basic con las mismas credenciales de la app; solo una cuenta ADMIN puede verla.
 	@Bean
 	@Order(1)
 	public SecurityFilterChain docsSecurityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager)
@@ -73,8 +71,6 @@ public class SecurityConfig {
 						.authenticationEntryPoint((req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
 						.accessDeniedHandler((req, res, ex) -> res.sendError(HttpServletResponse.SC_FORBIDDEN)))
 				.authorizeHttpRequests(auth -> auth
-						// sendError (404, 403, 500…) reenvía a /error sin el JWT; si no se permite, ese
-						// reenvío responde 401 y el frontend cierra la sesión.
 						.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
 						.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/ping").permitAll()
@@ -97,8 +93,7 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowedOrigins(List.of(
-            "https://taller-costura-gray.vercel.app",
-			"http://localhost:5173"
+            "https://taller-costura-gray.vercel.app"
         ));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
