@@ -17,6 +17,8 @@ Antes de arrancar, crea el `.env` (mismas variables que el backend Java):
 - Prueba: `curl http://localhost:8080/api/ping` → `pong`
 - Docs interactivas: http://localhost:8080/docs (desactívalas con `DOCS_ENABLED=false`)
 - Tests (SQLite en memoria, no tocan Postgres): `uv run pytest`
+- Verificar que los modelos coinciden con las tablas reales (solo lectura):
+  `uv run python -m scripts.verificar_esquema`
 
 ## Compatibilidad con el backend Java
 
