@@ -1,6 +1,6 @@
 # Costurería
 
-Sistema web para la gestión de una costurería, compuesto por una API REST en Spring Boot y una aplicación frontend en React.
+Sistema web para la gestión de una costurería, compuesto por una API REST en FastAPI (Python) y una aplicación frontend en React.
 
 Para el detalle completo de cada parte (configuración, endpoints, estructura de carpetas, notas de desarrollo), ve a su propio README:
 
@@ -13,7 +13,7 @@ Este README cubre solo el arranque rápido del proyecto completo.
 
 ```text
 Costureria/
-├── backend/        # API REST con Spring Boot
+├── backend/        # API REST con FastAPI
 ├── tallerCostura/  # Aplicación web con React y TypeScript
 └── README.md
 ```
@@ -29,14 +29,14 @@ Costureria/
 
 ### Backend
 
-- Java 17
-- Spring Boot 4.1.1
-- Spring Security
-- JWT
-- Spring Data JPA
+- Python 3.14
+- FastAPI
+- SQLAlchemy 2
+- Pydantic
+- JWT (PyJWT) + BCrypt
 - PostgreSQL
-- Maven
-- Lombok
+- uv
+- Docker
 
 ### Frontend
 
@@ -49,7 +49,7 @@ Costureria/
 
 ## Requisitos
 
-- Java 17 (exactamente esa versión — Lombok no soporta JDKs más nuevos en este proyecto, ver `backend/README.md`)
+- [uv](https://docs.astral.sh/uv/) (instala Python 3.14 y las dependencias del backend)
 - Node.js 20 o superior
 - npm
 - PostgreSQL
@@ -57,48 +57,40 @@ Costureria/
 
 ## Configuración del backend
 
-Desde la carpeta `backend`, crea un archivo `.env`:
+Desde la carpeta `backend`, copia `.env.example` a `.env` y completa los valores:
 
 ```env
-DB_URL=jdbc:postgresql://localhost:5432/costureria
+DB_URL=postgresql://localhost:5432/costureria
 DB_USER=postgres
 DB_PASSWORD=tu contraseña
 JWT_SECRET_KEY=una clave secreta segura de al menos 32 caracteres
 ```
 
-Asegúrate de que la base de datos exista:
+La base de datos debe existir y tener las tablas creadas: el backend no las crea por sí mismo
+(ver "Esquema de la base de datos" en `backend/README.md`).
 
-```sql
-CREATE DATABASE costureria;
-```
+El resto de variables opcionales (`CORS_ORIGINS`, `TZ`, `DOCS_ENABLED`, cuenta ADMIN inicial…)
+están documentadas en `backend/README.md`.
 
 ## Ejecutar el backend
 
 ```bash
 cd backend
-./mvnw spring-boot:run
+uv sync
+uv run uvicorn app.main:app --reload --port 8080
 ```
 
-En Linux, si el archivo no tiene permisos:
+La API estará disponible en `http://localhost:8080`, y la documentación interactiva en
+`http://localhost:8080/docs`.
 
-```bash
-chmod +x mvnw
-./mvnw spring-boot:run
-```
-
-La API estará disponible en:
-
-```text
-http://localhost:8080
-```
-
-## Compilar y probar el backend
+## Probar el backend
 
 ```bash
 cd backend
-./mvnw clean package
-./mvnw test
+uv run pytest
 ```
+
+Los tests usan SQLite en memoria, así que no necesitan PostgreSQL.
 
 ## Configuración del frontend
 
@@ -159,17 +151,25 @@ http://localhost:5173
 
 También debe permitir las solicitudes `OPTIONS` utilizadas por el navegador para las peticiones preflight.
 
-En producción, agrega el dominio real del frontend a la configuración CORS (`backend`, `SecurityConfig`).
+En producción, define la variable `CORS_ORIGINS` del backend con el dominio real del frontend, en formato JSON:
+
+```env
+CORS_ORIGINS=["https://taller-costura-gray.vercel.app"]
+```
 
 ## Construir para producción
 
 ### Backend
 
+Con Docker (la imagen ya trae `TZ=America/Guayaquil` y `/docs` desactivado):
+
 ```bash
 cd backend
-./mvnw clean package
-java -jar target/backend-0.0.1-SNAPSHOT.jar
+docker build -t costureria-backend .
+docker run -d --env-file .env -p 8080:8080 costureria-backend
 ```
+
+Detalles del despliegue en `backend/README.md`.
 
 ### Frontend
 
@@ -192,7 +192,7 @@ Verifica que:
 
 1. El backend esté ejecutándose.
 2. La URL de la API configurada en `tallerCostura/src/api/client.ts` sea correcta.
-3. `http://localhost:5173` esté permitido en CORS.
+3. `http://localhost:5173` esté permitido en `CORS_ORIGINS` (lo está por defecto).
 4. Las solicitudes `OPTIONS` estén habilitadas.
 
 ### Error de conexión con PostgreSQL
@@ -203,10 +203,14 @@ Verifica:
 - Que la base de datos exista.
 - Que las credenciales de `.env` sean correctas.
 - Que `DB_URL` utilice el puerto correcto.
+- Con Supabase, usa el host y el usuario exactos que aparecen en *Connect → Session pooler*
+  (el error `tenant/user ... not found` significa que el host o el usuario no corresponden, o que el
+  proyecto está pausado).
 
-### Lombok falla al compilar el backend
+### La fecha de "hoy" o la semana de pago no cuadran
 
-Si ves errores de símbolos no encontrados en clases con `@Data`/`@Builder`, es casi siempre el JDK: fuerza Java 17 con `JAVA_HOME=/usr/lib/jvm/java-17-openjdk ./mvnw ...` (ver `backend/README.md`).
+El backend usa la zona horaria del servidor. Fuera de Docker, arráncalo con
+`TZ=America/Guayaquil`; la imagen de Docker ya la trae configurada.
 
 ## Licencia
 
