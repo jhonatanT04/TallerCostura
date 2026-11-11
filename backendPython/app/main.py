@@ -5,7 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.exceptions import register_exception_handlers
-from app.routers import auth, clientes, empleados, ordenes, ping, registros
+from app.routers import (
+    auth,
+    clientes,
+    configuracion_pago,
+    empleados,
+    ordenes,
+    pagos,
+    ping,
+    registros,
+)
 from app.seed import seed_admin
 
 settings = get_settings()
@@ -41,3 +50,5 @@ app.include_router(empleados.router)
 app.include_router(registros.router)
 app.include_router(clientes.router)
 app.include_router(ordenes.router)
+app.include_router(configuracion_pago.router)
+app.include_router(pagos.router)

@@ -28,7 +28,7 @@ Ambos backends pueden apuntar a la **misma base de datos** mientras dure la migr
 - Los JWT tienen los mismos claims (`sub`, `role`, `iat`, `exp`) y el mismo algoritmo que elige
   jjwt según el largo del secreto: con el mismo `JWT_SECRET_KEY`, un token emitido por un backend sirve en el otro.
 
-- `GET /api/registros/getForDate` interpreta las fechas en la zona horaria del servidor
+- `GET /api/registros/getForDate` y el cálculo semanal de pagos interpretan las fechas en la zona horaria del servidor
   (como `ZoneId.systemDefault()` en Java). Si el servidor corre en UTC (Docker, la nube),
   arráncalo con `TZ=America/Guayaquil` para que "hoy" sea el día de Ecuador.
 
@@ -40,7 +40,7 @@ app/
 ├── database.py      # engine/sesión de SQLAlchemy
 ├── exceptions.py    # errores como {"message": "..."}
 ├── seed.py          # AdminSeeder
-├── models/          # entidades (Usuario, RegistroBlusa, Cliente, Orden, ...)
+├── models/          # entidades (Usuario, RegistroBlusa, Cliente, Orden, OrdenPago, ...)
 ├── schemas/         # DTOs de request/response (Pydantic)
 ├── services/        # lógica de negocio
 ├── security/        # JWT, BCrypt, dependencias de auth/roles
@@ -55,4 +55,5 @@ app/
 - [x] Empleados: crear, listar, activar, pago, password, eliminar (soft delete), `GET /{id}/registros`
 - [x] Registros: crear, `mios`, últimos 30 días, `getForDate`
 - [x] Clientes (crear, listar) / Órdenes (crear, listar, obtener, por cliente)
-- [ ] Configuración de pago / Pagos
+- [x] Configuración de pago (`GET`/`PUT`) / Pagos (previsualizar, calcular, listar, por empleado, `mios`)
+- [ ] Probar contra la base Postgres real y apuntar el frontend a este backend

@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime, time, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from fastapi import HTTPException, status
 from sqlalchemy import Select, select
@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.models import RegistroBlusa, Usuario
 from app.schemas.registro import CrearRegistroRequest, RegistroDTO
+from app.services.fechas import hoy_local, rango_local
 from app.services.talla_catalog import TALLAS_VALIDAS
 
 
@@ -49,12 +50,9 @@ def registros_por_empleado(db: Session, empleado_id: int) -> list[RegistroDTO]:
 def registros_por_fecha(
     db: Session, fecha_inicio: date | None, fecha_fin: date | None, empleado_id: int | None
 ) -> list[RegistroDTO]:
-    """Rango de fechas (por defecto, hoy) en la zona horaria del servidor, igual que
-    `ZoneId.systemDefault()` en Java: se controla con la variable de entorno TZ."""
-    hoy = datetime.now().date()
-    tz_local = datetime.now().astimezone().tzinfo
-    inicio = datetime.combine(fecha_inicio or hoy, time.min, tz_local)
-    fin = datetime.combine(fecha_fin or hoy, time.max, tz_local)
+    """Rango de fechas (por defecto, hoy) en la zona horaria del servidor."""
+    hoy = hoy_local()
+    inicio, fin = rango_local(fecha_inicio or hoy, fecha_fin or hoy)
 
     query = _entre(_query(), inicio, fin)
     if empleado_id is not None:
