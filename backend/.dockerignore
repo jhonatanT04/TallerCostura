@@ -1,9 +1,11 @@
+.venv/
 .env
 .env.*
-target/
-.git/
-.idea/
-.vscode/
-*.iml
+!.env.example
+.pytest_cache/
+**/__pycache__/
+*.pyc
+tests/
+Dockerfile
+.dockerignore
 README.md
-CLAUDE.md
