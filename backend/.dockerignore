@@ -1,9 +1,0 @@
-.env
-.env.*
-target/
-.git/
-.idea/
-.vscode/
-*.iml
-README.md
-CLAUDE.md
