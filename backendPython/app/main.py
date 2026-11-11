@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.exceptions import register_exception_handlers
-from app.routers import auth, empleados, ping
+from app.routers import auth, empleados, ping, registros
 from app.seed import seed_admin
 
 settings = get_settings()
@@ -38,3 +38,4 @@ register_exception_handlers(app)
 app.include_router(ping.router)
 app.include_router(auth.router)
 app.include_router(empleados.router)
+app.include_router(registros.router)

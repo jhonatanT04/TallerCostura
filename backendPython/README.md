@@ -28,6 +28,10 @@ Ambos backends pueden apuntar a la **misma base de datos** mientras dure la migr
 - Los JWT tienen los mismos claims (`sub`, `role`, `iat`, `exp`) y el mismo algoritmo que elige
   jjwt según el largo del secreto: con el mismo `JWT_SECRET_KEY`, un token emitido por un backend sirve en el otro.
 
+- `GET /api/registros/getForDate` interpreta las fechas en la zona horaria del servidor
+  (como `ZoneId.systemDefault()` en Java). Si el servidor corre en UTC (Docker, la nube),
+  arráncalo con `TZ=America/Guayaquil` para que "hoy" sea el día de Ecuador.
+
 ## Estructura
 
 ```
@@ -49,6 +53,6 @@ app/
 - [x] Conexión a PostgreSQL + modelo `Usuario`
 - [x] Auth: `POST /api/auth/login`, `POST /api/auth/register`, JWT, roles, seeder del ADMIN
 - [x] Empleados: crear, listar, activar, pago, password, eliminar (soft delete), `GET /{id}/registros`
-- [ ] Registros
+- [x] Registros: crear, `mios`, últimos 30 días, `getForDate`
 - [ ] Clientes / Órdenes
 - [ ] Configuración de pago / Pagos

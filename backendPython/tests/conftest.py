@@ -1,4 +1,5 @@
 import os
+import time
 
 # Configuración de test ANTES de importar la app (BD en memoria, nunca Postgres).
 os.environ.update(
@@ -8,7 +9,10 @@ os.environ.update(
     JWT_SECRET_KEY="test-secret-key-de-al-menos-32-bytes!!",
     ADMIN_USERNAME="jefa",
     ADMIN_PASSWORD="jefa1234",
+    # SQLite guarda fechas sin zona horaria: con TZ=UTC la hora local y UTC coinciden.
+    TZ="UTC",
 )
+time.tzset()
 
 import pytest
 from fastapi.testclient import TestClient
@@ -38,3 +42,10 @@ def auth(token: str) -> dict:
 @pytest.fixture
 def admin(client) -> dict:
     return auth(login(client, "jefa", "jefa1234"))
+
+
+def crear_empleado(client, admin, username: str = "maria", **extra) -> dict:
+    body = {"username": username, "password": "secreta1", "nombreCompleto": username.title(), **extra}
+    r = client.post("/api/empleados", json=body, headers=admin)
+    assert r.status_code == 201, r.text
+    return r.json()
