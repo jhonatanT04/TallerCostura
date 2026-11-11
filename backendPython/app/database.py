@@ -1,4 +1,7 @@
 from collections.abc import Iterator
+from typing import Annotated
+
+from fastapi import Depends
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL, make_url
@@ -43,3 +46,6 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False
 def get_db() -> Iterator[Session]:
     with SessionLocal() as db:
         yield db
+
+
+DB = Annotated[Session, Depends(get_db)]

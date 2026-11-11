@@ -29,3 +29,12 @@ def login(client: TestClient, username: str, password: str) -> str:
     r = client.post("/api/auth/login", json={"username": username, "password": password})
     assert r.status_code == 200, r.text
     return r.json()["token"]
+
+
+def auth(token: str) -> dict:
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def admin(client) -> dict:
+    return auth(login(client, "jefa", "jefa1234"))

@@ -1,18 +1,13 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, HTTPException, Response, status
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
-from app.database import get_db
+from app.database import DB
 from app.models import Role, Usuario
 from app.schemas.auth import LoginRequest, LoginResponse, RegisterRequest
 from app.security.jwt_service import generate_token
 from app.security.passwords import hash_password, verify_password
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
-
-DB = Annotated[Session, Depends(get_db)]
 
 
 @router.post("/login", response_model=LoginResponse)

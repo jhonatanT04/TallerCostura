@@ -36,8 +36,9 @@ app/
 ├── database.py      # engine/sesión de SQLAlchemy
 ├── exceptions.py    # errores como {"message": "..."}
 ├── seed.py          # AdminSeeder
-├── models/          # entidades (Usuario, ...)
+├── models/          # entidades (Usuario, RegistroBlusa, ...)
 ├── schemas/         # DTOs de request/response (Pydantic)
+├── services/        # lógica de negocio
 ├── security/        # JWT, BCrypt, dependencias de auth/roles
 └── routers/         # controladores
 ```
@@ -47,7 +48,7 @@ app/
 - [x] `GET /api/ping`
 - [x] Conexión a PostgreSQL + modelo `Usuario`
 - [x] Auth: `POST /api/auth/login`, `POST /api/auth/register`, JWT, roles, seeder del ADMIN
-- [ ] Empleados
+- [x] Empleados: crear, listar, activar, pago, password, eliminar (soft delete), `GET /{id}/registros`
 - [ ] Registros
 - [ ] Clientes / Órdenes
 - [ ] Configuración de pago / Pagos

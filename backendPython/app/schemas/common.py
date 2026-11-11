@@ -1,6 +1,7 @@
+from decimal import Decimal
 from typing import Annotated
 
-from pydantic import AfterValidator, BaseModel, ConfigDict
+from pydantic import AfterValidator, BaseModel, ConfigDict, PlainSerializer
 from pydantic.alias_generators import to_camel
 from pydantic_core import PydanticCustomError
 
@@ -18,3 +19,19 @@ def _not_blank(v: str) -> str:
 
 
 NotBlank = Annotated[str, AfterValidator(_not_blank)]
+
+
+# BigDecimal de Java se serializa como número JSON (no como string, que es lo que
+# Pydantic hace por defecto con Decimal).
+Money = Annotated[Decimal, PlainSerializer(float, return_type=float, when_used="json")]
+
+
+def _min_6(v: str) -> str:
+    if len(v) < 6:
+        raise PydanticCustomError(
+            "password_size", "La contraseña debe tener al menos 6 caracteres"
+        )
+    return v
+
+
+Password = Annotated[NotBlank, AfterValidator(_min_6)]

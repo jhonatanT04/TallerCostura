@@ -21,7 +21,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         partes = []
         for err in exc.errors():
             loc = err["loc"]
-            if loc and loc[0] == "query":
+            if loc and loc[0] in ("query", "path"):
                 return JSONResponse(
                     {"message": f"Falta el parámetro {loc[-1]}"}
                     if err["type"] == "missing"

@@ -1,18 +1,5 @@
-from typing import Annotated
-
-from pydantic import AfterValidator
-from pydantic_core import PydanticCustomError
-
 from app.models import Role
-from app.schemas.common import CamelModel, NotBlank
-
-
-def _min_6(v: str) -> str:
-    if len(v) < 6:
-        raise PydanticCustomError(
-            "password_size", "La contraseña debe tener al menos 6 caracteres"
-        )
-    return v
+from app.schemas.common import CamelModel, NotBlank, Password
 
 
 class LoginRequest(CamelModel):
@@ -29,5 +16,5 @@ class LoginResponse(CamelModel):
 
 class RegisterRequest(CamelModel):
     username: NotBlank
-    password: Annotated[NotBlank, AfterValidator(_min_6)]
+    password: Password
     nombre_completo: NotBlank
