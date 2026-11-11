@@ -1,11 +1,11 @@
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import AfterValidator
 from pydantic_core import PydanticCustomError
 
 from app.models import RegistroBlusa
-from app.schemas.common import CamelModel, NotBlank
+from app.schemas.common import CamelModel, NotBlank, utc
 from app.schemas.empleado import EmpleadoResponse
 
 
@@ -46,12 +46,7 @@ class RegistroDTO(CamelModel):
             cantidad_confeccion=r.cantidad_confeccion,
             cantidad_mullos=r.cantidad_mullos,
             cantidad_ataches=r.cantidad_ataches,
-            fecha_registro=_utc(r.fecha_registro),
+            fecha_registro=utc(r.fecha_registro),
             empleado=EmpleadoResponse.de(r.usuario),
         )
 
-
-def _utc(dt: datetime) -> datetime:
-    # Igual que un Instant de Java: siempre en UTC ("...Z"), sin importar la zona
-    # horaria de la sesión de Postgres. SQLite (tests) devuelve fechas sin zona.
-    return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.astimezone(UTC)

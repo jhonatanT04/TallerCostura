@@ -28,7 +28,17 @@ def register_exception_handlers(app: FastAPI) -> None:
                     else {"message": f"Valor inválido para el parámetro {loc[-1]}"},
                     status_code=400,
                 )
-            campo = loc[-1] if loc else "body"
+            campo = _ruta(loc)
             msg = "no debe estar vacío" if err["type"] == "missing" else err["msg"]
             partes.append(f"{campo}: {msg}")
         return JSONResponse({"message": ", ".join(partes)}, status_code=400)
+
+
+def _ruta(loc: tuple) -> str:
+    partes = [p for p in loc if p != "body"]
+    if not partes:
+        return "body"
+    ruta = ""
+    for p in partes:
+        ruta += f"[{p}]" if isinstance(p, int) else (f".{p}" if ruta else str(p))
+    return ruta

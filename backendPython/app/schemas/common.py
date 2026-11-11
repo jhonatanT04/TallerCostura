@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Annotated
 
@@ -35,3 +36,9 @@ def _min_6(v: str) -> str:
 
 
 Password = Annotated[NotBlank, AfterValidator(_min_6)]
+
+
+def utc(dt: datetime) -> datetime:
+    """Igual que un Instant de Java: siempre en UTC ("...Z"), sin importar la zona
+    horaria de la sesión de Postgres. SQLite (tests) devuelve fechas sin zona."""
+    return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.astimezone(UTC)
