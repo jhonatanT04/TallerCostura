@@ -865,3 +865,119 @@
 .table-wrap > .error {
   padding: 16px;
 }
+
+/* Botones de Google y Facebook (login y cuentas vinculadas). */
+.social {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.social-separador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.social-separador::before,
+.social-separador::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-secondary);
+}
+
+.social-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.social-botones.deshabilitado {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* El botón de Google lo dibuja su SDK (con sus colores oficiales); solo se centra. */
+.social-google {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* Colores oficiales de Facebook. */
+.social-facebook {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  min-height: 44px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #1877f2;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.social-facebook:hover:not(:disabled) {
+  background: #166fe5;
+}
+
+.social-facebook:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.social-facebook:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vinculos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vinculo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+}
+
+.vinculo-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vinculo-proveedor {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vinculo-detalle {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

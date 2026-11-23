@@ -5,6 +5,7 @@ import {
   ClipboardTextIcon,
   GearIcon,
   HouseIcon,
+  LinkSimpleIcon,
   ListIcon,
   PackageIcon,
   ReceiptIcon,
@@ -17,6 +18,7 @@ import {
 } from '@phosphor-icons/react'
 import { useAuth } from '../../auth/AuthContext'
 import { iniciales } from '../../lib/formato'
+import { CuentasVinculadas } from '../CuentasVinculadas'
 import { FormConfiguracionPago } from '../FormConfiguracionPago'
 import { Modal } from '../Modal'
 import { IconButton } from '../ui/IconButton'
@@ -68,6 +70,7 @@ export function AppLayout() {
   const isDesktop = useIsDesktop()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [configOpen, setConfigOpen] = useState(false)
+  const [vinculosOpen, setVinculosOpen] = useState(false)
 
   const drawerVisible = drawerOpen && !isDesktop
 
@@ -146,6 +149,18 @@ export function AppLayout() {
             </button>
           )}
 
+          <button
+            type="button"
+            className="shell-nav-item"
+            onClick={() => {
+              cerrarDrawer()
+              setVinculosOpen(true)
+            }}
+          >
+            <LinkSimpleIcon size={20} aria-hidden="true" />
+            Cuentas vinculadas
+          </button>
+
           <div className="shell-user">
             <span className="shell-avatar" aria-hidden="true">
               {iniciales(user.nombreCompleto || user.username)}
@@ -164,6 +179,12 @@ export function AppLayout() {
           <Outlet />
         </div>
       </main>
+
+      {vinculosOpen && (
+        <Modal onClose={() => setVinculosOpen(false)} label="Cuentas vinculadas">
+          <CuentasVinculadas onClose={() => setVinculosOpen(false)} />
+        </Modal>
+      )}
 
       {configOpen && (
         <Modal onClose={() => setConfigOpen(false)} label="Configuración de pagos">

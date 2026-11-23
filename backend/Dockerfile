@@ -17,6 +17,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev --no-install-project
 
 COPY app ./app
+COPY alembic.ini ./
+COPY migrations ./migrations
 COPY scripts ./scripts
 
 # ---- Runtime: imagen final sin uv ni herramientas de build ----

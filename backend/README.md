@@ -24,6 +24,9 @@ tienen prioridad sobre el `.env`.
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | no | `jefa` / `jefa1234` | Cuenta ADMIN que se crea al arrancar **solo si no existe ningún ADMIN** |
 | `CORS_ORIGINS` | no | `["http://localhost:5173","https://taller-costura-gray.vercel.app"]` | Orígenes permitidos, en formato JSON |
 | `DOCS_ENABLED` | no | `true` (`false` en Docker) | Activa `/docs` y `/openapi.json` (son públicos) |
+| `GOOGLE_CLIENT_ID` | no | — | Client ID de OAuth de Google (tipo "Aplicación web"). Sin él no aparece el botón de Google |
+| `FACEBOOK_APP_ID` / `FACEBOOK_APP_SECRET` | no | — | App de Facebook Login. Sin ambos no aparece el botón de Facebook. El secreto nunca sale del backend |
+| `FACEBOOK_GRAPH_VERSION` | no | `v26.0` | Versión de la Graph API (backend y SDK del navegador) |
 | `TZ` | no | zona del sistema (`America/Guayaquil` en Docker) | Zona horaria para "hoy" y para cortar la semana de pago |
 
 ## Desarrollo
@@ -79,6 +82,11 @@ En la plataforma de despliegue configura las variables de la tabla anterior. Com
 | `GET /api/ping` | público | Health check, responde `pong` |
 | `POST /api/auth/login` | público | Devuelve `token`, `role`, `username`, `nombreCompleto` |
 | `POST /api/auth/register` | público | Auto-registro de empleada; queda **inactiva** hasta que la ADMIN la active |
+| `GET /api/auth/proveedores` | público | Qué proveedores están habilitados y sus ids públicos (`clientId` de Google, `appId` de Facebook) |
+| `POST /api/auth/social` | público | Entra con `{proveedor: GOOGLE\|FACEBOOK, token}`. Devuelve `estado` `AUTENTICADO` (con `sesion`, igual que `/login`) o `PENDIENTE` |
+| `GET /api/auth/vinculos` | con sesión | Cuentas de Google/Facebook vinculadas al usuario |
+| `POST /api/auth/vinculos` | con sesión | Vincula la cuenta del `token` al usuario (`409` si es de otro usuario o ya tiene una de ese proveedor) |
+| `DELETE /api/auth/vinculos/{proveedor}` | con sesión | Desvincula; el usuario sigue entrando con su contraseña |
 | `POST /api/empleados` | ADMIN | Crea una empleada activa (`pagoPorBlusa` opcional, 0 por defecto) |
 | `GET /api/empleados` | ADMIN | Lista empleadas, incluidas las pendientes de activar |
 | `GET /api/empleados/{id}/registros` | ADMIN | Registros de una empleada |
@@ -102,6 +110,37 @@ Todas las rutas que no son públicas necesitan `Authorization: Bearer <token>`: 
 uno inválido o vencido dan **401**, y con el rol equivocado **403**. Los errores siempre tienen
 la forma `{"message": "..."}` (los de validación responden **400**, no el 422 por defecto de FastAPI).
 
+## Inicio de sesión con Google y Facebook
+
+Además de usuario y contraseña. El navegador obtiene un token con el SDK oficial de cada
+proveedor y el backend lo **verifica** antes de confiar en él:
+
+- **Google:** el ID token (JWT) de Google Identity Services. Se valida la firma con las claves
+  públicas de Google, que la audiencia sea `GOOGLE_CLIENT_ID`, el emisor y la fecha.
+- **Facebook:** el access token de `FB.login()`. Se valida con `debug_token` que sea válido y
+  de **esta** app (`FACEBOOK_APP_ID`), y el perfil se lee con `appsecret_proof`.
+
+Después, el backend emite su propio JWT, igual que el login con contraseña. La cuenta se
+identifica por el id que da el proveedor, no por el correo.
+
+- **Cuenta de Google/Facebook nueva:** se crea una EMPLEADA **inactiva** (con una contraseña
+  aleatoria que nadie conoce) y queda pendiente, como el auto-registro. La ADMIN la activa
+  en Empleados.
+- **Usuarios existentes** (incluida la ADMIN): entran con su contraseña y vinculan su cuenta en
+  **Cuentas vinculadas** (menú lateral). Desde entonces pueden entrar también con ella.
+- Un usuario dado de baja no puede entrar por ningún medio (**403**).
+
+Para habilitarlos:
+
+1. **Google:** en Google Cloud Console → APIs y servicios → Credenciales, crea un "ID de cliente
+   de OAuth" de tipo **Aplicación web** y agrega en "Orígenes de JavaScript autorizados" las URLs
+   del frontend (`http://localhost:5173` y el dominio de Vercel). Copia el Client ID a
+   `GOOGLE_CLIENT_ID`.
+2. **Facebook:** en developers.facebook.com crea una app con **Facebook Login** para web, agrega
+   los dominios del frontend en "Dominios permitidos para el SDK de JavaScript" y copia el App ID
+   y el App Secret a `FACEBOOK_APP_ID` / `FACEBOOK_APP_SECRET`. Facebook exige HTTPS fuera de
+   `localhost`, y para que lo use gente que no administra la app hay que pasarla a modo "Live".
+
 ## Reglas de negocio
 
 - **Cuentas:** una cuenta inactiva (pendiente de aprobación) o eliminada no puede iniciar sesión y
@@ -118,16 +157,30 @@ la forma `{"message": "..."}` (los de validación responden **400**, no el 422 p
     puede deshacer.
   - Los montos quedan congelados: si después cambian las tarifas, el pago guardado no cambia.
 
-## Esquema de la base de datos
+## Esquema de la base de datos (Alembic)
 
-Los modelos de SQLAlchemy **mapean tablas que ya existen**: la aplicación no crea ni modifica
-tablas en Postgres. Las tablas (`usuarios`, `registros_blusa`, `clientes`, `ordenes`,
-`orden_items`, `configuracion_pago`, `ordenes_pago`) las creó el backend anterior en Spring Boot.
+El esquema se gestiona con migraciones de **Alembic** (`migrations/`), con la misma conexión
+que la API (`DB_URL`, `DB_USER`, `DB_PASSWORD`):
 
-> **Pendiente:** con el backend anterior eliminado, ya no hay nada que gestione el esquema. Para
-> una base nueva o para cambiar un modelo hay que crear las tablas o columnas a mano. Lo
-> recomendable es agregar migraciones con **Alembic**: una migración base marcada como aplicada
-> con `alembic stamp` sobre la base actual, y desde ahí `alembic revision --autogenerate`.
+| Migración | Qué hace |
+|---|---|
+| `0001` | Las tablas que creó el backend anterior en Spring Boot (`usuarios`, `registros_blusa`, `clientes`, `ordenes`, `orden_items`, `configuracion_pago`, `ordenes_pago`) |
+| `0002` | `identidades_externas`: cuentas de Google/Facebook vinculadas a un usuario |
+
+**Base que ya existe (la de producción), solo la primera vez:** las tablas de `0001` ya están
+creadas, así que se marca como aplicada sin ejecutarla y después se aplica el resto:
+
+```bash
+uv run alembic stamp 0001     # no toca las tablas: solo registra que 0001 ya está
+uv run alembic upgrade head   # crea identidades_externas
+```
+
+**Base nueva:** `uv run alembic upgrade head` crea todo desde cero.
+
+**Cambiar un modelo:** `uv run alembic revision --autogenerate -m "descripción"`, revisa el
+archivo generado y aplícalo con `upgrade head`. El test `tests/test_migraciones.py` falla si las
+migraciones y los modelos dejan de coincidir. Las migraciones **no** se aplican solas al
+arrancar la API: se corren a mano (o en el paso de despliegue).
 
 Los tokens y contraseñas son compatibles con los del backend anterior: BCrypt `$2a$` y JWT HS256,
 HS384 o HS512 según el largo del secreto. Los usuarios y sesiones existentes siguen funcionando.
@@ -147,6 +200,7 @@ backend/
 │   ├── services/        # lógica de negocio
 │   ├── security/        # JWT, BCrypt, dependencias de auth y roles
 │   └── routers/         # endpoints
+├── migrations/          # Alembic (alembic.ini en la raíz del backend)
 ├── scripts/
 │   └── verificar_esquema.py
 ├── tests/

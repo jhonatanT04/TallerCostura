@@ -1,6 +1,10 @@
 import { apiFetch } from './client'
 import type {
   AuthUser,
+  ConfigProveedores,
+  ProveedorSocial,
+  SocialLoginResponse,
+  VinculoSocial,
   CalcularPagoInput,
   Cliente,
   ConfiguracionPagoDTO,
@@ -17,6 +21,10 @@ import type {
 export { ApiError, mensajeDeError } from './client'
 export type {
   AuthUser,
+  ConfigProveedores,
+  ProveedorSocial,
+  SocialLoginResponse,
+  VinculoSocial,
   CalcularPagoInput,
   Cliente,
   ConfiguracionPagoDTO,
@@ -41,6 +49,32 @@ export function login(username: string, password: string): Promise<AuthUser> {
     body: JSON.stringify({ username, password }),
   })
 }
+export function getProveedores(): Promise<ConfigProveedores> {
+  return apiFetch<ConfigProveedores>('/auth/proveedores')
+}
+
+export function loginSocial(proveedor: ProveedorSocial, token: string): Promise<SocialLoginResponse> {
+  return apiFetch<SocialLoginResponse>('/auth/social', {
+    method: 'POST',
+    body: JSON.stringify({ proveedor, token }),
+  })
+}
+
+export function getVinculos(): Promise<VinculoSocial[]> {
+  return apiFetch<VinculoSocial[]>('/auth/vinculos')
+}
+
+export function vincularCuenta(proveedor: ProveedorSocial, token: string): Promise<VinculoSocial[]> {
+  return apiFetch<VinculoSocial[]>('/auth/vinculos', {
+    method: 'POST',
+    body: JSON.stringify({ proveedor, token }),
+  })
+}
+
+export function desvincularCuenta(proveedor: ProveedorSocial): Promise<void> {
+  return apiFetch<void>(`/auth/vinculos/${proveedor}`, { method: 'DELETE' })
+}
+
 export function register(
   nombreCompleto: string,
   username: string,

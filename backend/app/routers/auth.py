@@ -2,8 +2,18 @@ from fastapi import APIRouter, HTTPException, Response, status
 from sqlalchemy import select
 
 from app.database import DB
-from app.models import Role, Usuario
-from app.schemas.auth import LoginRequest, LoginResponse, RegisterRequest
+from app.models import ProveedorSocial, Role, Usuario
+from app.schemas.auth import (
+    LoginRequest,
+    LoginResponse,
+    ProveedoresResponse,
+    RegisterRequest,
+    SocialLoginRequest,
+    SocialLoginResponse,
+    VinculoDTO,
+)
+from app.security.deps import CurrentUser
+from app.services import social_service
 from app.security.jwt_service import generate_token
 from app.security.passwords import hash_password, verify_password
 
@@ -49,3 +59,32 @@ def register(request: RegisterRequest, db: DB) -> Response:
     )
     db.commit()
     return Response(status_code=status.HTTP_201_CREATED)
+
+
+# --- Google y Facebook ----------------------------------------------------------------------
+
+@router.get("/proveedores", response_model=ProveedoresResponse)
+def proveedores() -> ProveedoresResponse:
+    """Qué botones mostrar en el login y con qué ids públicos cargar los SDK."""
+    return social_service.proveedores()
+
+
+@router.post("/social", response_model=SocialLoginResponse)
+def login_social(request: SocialLoginRequest, db: DB) -> SocialLoginResponse:
+    return social_service.iniciar_sesion(db, request.proveedor, request.token)
+
+
+@router.get("/vinculos", response_model=list[VinculoDTO])
+def vinculos(usuario: CurrentUser, db: DB):
+    return social_service.vinculos(db, usuario)
+
+
+@router.post("/vinculos", response_model=list[VinculoDTO])
+def vincular(request: SocialLoginRequest, usuario: CurrentUser, db: DB):
+    return social_service.vincular(db, usuario, request.proveedor, request.token)
+
+
+@router.delete("/vinculos/{proveedor}", status_code=status.HTTP_204_NO_CONTENT)
+def desvincular(proveedor: ProveedorSocial, usuario: CurrentUser, db: DB) -> Response:
+    social_service.desvincular(db, usuario, proveedor)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

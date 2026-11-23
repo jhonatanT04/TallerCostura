@@ -1,13 +1,15 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import type { ProveedorSocial } from '../api'
 import { ApiError } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import { AuthLayout } from '../components/AuthLayout'
+import { BotonesSociales } from '../components/BotonesSociales'
 import { PasswordInput } from '../components/PasswordInput'
 import { Button } from '../components/ui/Button'
 
 export function LoginPage() {
-  const { login } = useAuth()
+  const { login, loginSocial } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const registered = Boolean((location.state as { registered?: boolean } | null)?.registered)
@@ -15,6 +17,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [pendiente, setPendiente] = useState<string | null>(null)
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -36,6 +39,27 @@ export function LoginPage() {
     }
   }
 
+  async function handleSocial(proveedor: ProveedorSocial, token: string) {
+    setError(null)
+    setPendiente(null)
+    setLoading(true)
+    try {
+      const resultado = await loginSocial(proveedor, token)
+      if (resultado.estado === 'AUTENTICADO') {
+        navigate('/', { replace: true })
+      } else {
+        setPendiente(resultado.mensaje ?? 'Tu cuenta está pendiente de aprobación por la administradora.')
+      }
+    } catch (err) {
+      // Los mensajes del backend aquí ya son para mostrar ("No se pudo verificar tu cuenta de Google").
+      setError(
+        err instanceof ApiError && err.serverMessage ? err.serverMessage : 'No se pudo iniciar sesión. Intenta de nuevo.',
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <AuthLayout
       title="Inicia sesión"
@@ -46,7 +70,12 @@ export function LoginPage() {
         </>
       }
     >
-      {registered && (
+      {pendiente && (
+        <p className="auth-aviso" role="status">
+          {pendiente}
+        </p>
+      )}
+      {registered && !pendiente && (
         <p className="auth-aviso" role="status">
           Tu cuenta quedó pendiente de aprobación por la administradora. Podrás iniciar sesión cuando la active.
         </p>
@@ -80,6 +109,7 @@ export function LoginPage() {
           </p>
         )}
       </form>
+      <BotonesSociales onToken={handleSocial} deshabilitado={loading} conSeparador onError={setError} />
     </AuthLayout>
   )
 }

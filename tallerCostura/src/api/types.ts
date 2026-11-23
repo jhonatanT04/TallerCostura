@@ -124,3 +124,25 @@ export interface CalcularPagoInput {
   empleadoId: number
   semanaInicio: string
 }
+
+// Inicio de sesión con Google / Facebook.
+export type ProveedorSocial = 'GOOGLE' | 'FACEBOOK'
+
+// Datos públicos para cargar los SDK; null = ese proveedor no está habilitado.
+export interface ConfigProveedores {
+  google: { clientId: string } | null
+  facebook: { appId: string; version: string } | null
+}
+
+// PENDIENTE: la cuenta existe pero la administradora todavía no la activó.
+export interface SocialLoginResponse {
+  estado: 'AUTENTICADO' | 'PENDIENTE'
+  sesion: AuthUser | null
+  mensaje: string | null
+}
+
+export interface VinculoSocial {
+  proveedor: ProveedorSocial
+  email: string | null
+  vinculadoEn: string
+}

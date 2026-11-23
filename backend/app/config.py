@@ -25,6 +25,13 @@ class Settings(BaseSettings):
     ]
     docs_enabled: bool = True
 
+    # Inicio de sesión con Google / Facebook. Un proveedor sin configurar no aparece en el
+    # login. El client id y el app id son públicos (los usa el navegador); el secreto no.
+    google_client_id: str = ""
+    facebook_app_id: str = ""
+    facebook_app_secret: str = ""
+    facebook_graph_version: str = "v26.0"
+
     @field_validator("jwt_secret_key")
     @classmethod
     def _secret_min_32_bytes(cls, v: str) -> str:

@@ -2,6 +2,9 @@ const API_URL = 'https://tallercostura.onrender.com/api'
 
 const AUTH_STORAGE_KEY = 'auth'
 
+// Un 401 en estas rutas es "credenciales incorrectas", no "sesión vencida": no se redirige.
+const RUTAS_DE_LOGIN = ['/auth/login', '/auth/social']
+
 export class ApiError extends Error {
   status: number
   // Mensaje que mandó el backend en el body; null si solo hay statusText.
@@ -42,7 +45,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   const res = await fetch(`${API_URL}${path}`, { ...options, headers })
   if (res.status === 401) {
     localStorage.removeItem(AUTH_STORAGE_KEY)
-    if (path !== '/auth/login') {
+    if (!RUTAS_DE_LOGIN.includes(path)) {
       window.location.assign('/login')
     }
     throw new ApiError(res.status, res.statusText)
