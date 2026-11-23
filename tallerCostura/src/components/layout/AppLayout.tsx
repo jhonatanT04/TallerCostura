@@ -17,6 +17,7 @@ import {
 } from '@phosphor-icons/react'
 import { useAuth } from '../../auth/AuthContext'
 import { iniciales } from '../../lib/formato'
+import { AsistenteChat } from '../asistente/AsistenteChat'
 import { FormConfiguracionPago } from '../FormConfiguracionPago'
 import { Modal } from '../Modal'
 import { IconButton } from '../ui/IconButton'
@@ -164,6 +165,8 @@ export function AppLayout() {
           <Outlet />
         </div>
       </main>
+
+      {isAdmin && <AsistenteChat />}
 
       {configOpen && (
         <Modal onClose={() => setConfigOpen(false)} label="Configuración de pagos">

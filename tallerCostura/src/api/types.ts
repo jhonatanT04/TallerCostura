@@ -124,3 +124,24 @@ export interface CalcularPagoInput {
   empleadoId: number
   semanaInicio: string
 }
+
+// Asistente del panel (chat con IA). El servidor no guarda la conversación: se manda entera.
+export interface MensajeChat {
+  rol: 'user' | 'assistant'
+  texto: string
+}
+
+// El asistente nunca registra pagos: propone confirmarlo y el pago se registra con calcularPago.
+export interface AccionConfirmarPago {
+  tipo: 'CONFIRMAR_PAGO'
+  empleadoId: number
+  empleadoNombre: string
+  semanaInicio: string
+  semanaFin: string
+  montoTotal: number
+}
+
+export interface RespuestaAsistente {
+  respuesta: string
+  acciones: AccionConfirmarPago[]
+}

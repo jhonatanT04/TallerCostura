@@ -1,6 +1,8 @@
 import { apiFetch } from './client'
 import type {
   AuthUser,
+  MensajeChat,
+  RespuestaAsistente,
   CalcularPagoInput,
   Cliente,
   ConfiguracionPagoDTO,
@@ -16,7 +18,10 @@ import type {
 
 export { ApiError, mensajeDeError } from './client'
 export type {
+  AccionConfirmarPago,
   AuthUser,
+  MensajeChat,
+  RespuestaAsistente,
   CalcularPagoInput,
   Cliente,
   ConfiguracionPagoDTO,
@@ -188,4 +193,11 @@ export function getPagosDeEmpleado(empleadoId: number): Promise<OrdenPagoDTO[]> 
 
 export function getMisPagos(): Promise<OrdenPagoDTO[]> {
   return apiFetch<OrdenPagoDTO[]>('/pagos/mios')
+}
+
+export function preguntarAsistente(mensajes: MensajeChat[]): Promise<RespuestaAsistente> {
+  return apiFetch<RespuestaAsistente>('/asistente/chat', {
+    method: 'POST',
+    body: JSON.stringify({ mensajes }),
+  })
 }

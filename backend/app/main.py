@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.exceptions import register_exception_handlers
 from app.routers import (
+    asistente,
     auth,
     clientes,
     configuracion_pago,
@@ -16,6 +17,7 @@ from app.routers import (
     registros,
 )
 from app.seed import seed_admin
+from mcp_server.http import montar as montar_mcp, sesiones_mcp
 
 settings = get_settings()
 
@@ -23,7 +25,11 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     seed_admin()
-    yield
+    if settings.mcp_token:
+        async with sesiones_mcp():
+            yield
+    else:
+        yield
 
 
 app = FastAPI(
@@ -52,3 +58,8 @@ app.include_router(clientes.router)
 app.include_router(ordenes.router)
 app.include_router(configuracion_pago.router)
 app.include_router(pagos.router)
+app.include_router(asistente.router)
+
+# Servidor MCP por HTTP en /mcp, solo si hay token (ver mcp_server/http.py).
+if settings.mcp_token:
+    montar_mcp(app, settings.mcp_token)

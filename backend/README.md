@@ -24,6 +24,11 @@ tienen prioridad sobre el `.env`.
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | no | `jefa` / `jefa1234` | Cuenta ADMIN que se crea al arrancar **solo si no existe ningún ADMIN** |
 | `CORS_ORIGINS` | no | `["http://localhost:5173","https://taller-costura-gray.vercel.app"]` | Orígenes permitidos, en formato JSON |
 | `DOCS_ENABLED` | no | `true` (`false` en Docker) | Activa `/docs` y `/openapi.json` (son públicos) |
+| `ASISTENTE_PROVEEDOR` | no | `openai` | IA del asistente del panel: `openai`, `gemini` o `anthropic` (cualquier otro valor impide arrancar) |
+| `ASISTENTE_MODELO` | no | según el proveedor | Modelo a usar. Vacío: `gpt-5.5` (OpenAI), `gemini-3.5-flash` (Gemini), `claude-opus-5-5` (Anthropic) |
+| `OPENAI_API_KEY` / `GEMINI_API_KEY` / `ANTHROPIC_API_KEY` | no | — | Clave del proveedor elegido; las otras no se usan. Sin ella, `POST /api/asistente/chat` responde **503** y el resto funciona igual |
+| `MCP_TOKEN` | no | — | Si se define, publica el servidor MCP en `/mcp` (exige `Authorization: Bearer <MCP_TOKEN>`). Sin él, `/mcp` no existe |
+| `ASISTENTE_MCP_URL` / `ASISTENTE_MCP_TOKEN` | no | — | Para que el chat use un servidor MCP remoto. Vacío: usa el de este mismo proceso, sin red |
 | `TZ` | no | zona del sistema (`America/Guayaquil` en Docker) | Zona horaria para "hoy" y para cortar la semana de pago |
 
 ## Desarrollo
@@ -97,10 +102,48 @@ En la plataforma de despliegue configura las variables de la tabla anterior. Com
 | `POST /api/pagos/calcular` | ADMIN | Calcula y guarda el pago como `PAGADO` |
 | `GET /api/pagos`, `GET /api/pagos/empleado/{id}` | ADMIN | Historial de pagos |
 | `GET /api/pagos/mios` | EMPLEADO | Pagos propios |
+| `POST /api/asistente/chat` | ADMIN | Chat con IA de solo lectura (proveedor según `ASISTENTE_PROVEEDOR`): producción, empleadas y pagos. Recibe el historial `{mensajes: [{rol, texto}]}` y devuelve `{respuesta, acciones}`; cada acción `CONFIRMAR_PAGO` la registra el frontend con `POST /api/pagos/calcular` |
 
 Todas las rutas que no son públicas necesitan `Authorization: Bearer <token>`: sin token o con
 uno inválido o vencido dan **401**, y con el rol equivocado **403**. Los errores siempre tienen
 la forma `{"message": "..."}` (los de validación responden **400**, no el 422 por defecto de FastAPI).
+
+## Servidor MCP (`mcp_server/`)
+
+Todas las consultas del chat a la base de datos pasan por un servidor
+[MCP](https://modelcontextprotocol.io) hecho con el SDK oficial de Python (`mcp`). Sus
+herramientas son **de solo lectura** y reutilizan los servicios de `app/`, así que los montos
+coinciden con la página de Pagos:
+
+| Herramienta | Qué devuelve |
+|---|---|
+| `listar_empleados` | Empleadas con id, estado y tarifa por blusa |
+| `configuracion_pagos` | Precios globales de mullos y ataches |
+| `resumen_produccion` | Producción entre dos fechas: total, por empleada, por color y por talla |
+| `pago_semanal` | Lo que se le debe a una empleada en una semana, o el pago ya registrado |
+| `pagos_registrados` | Historial de pagos, filtrable por empleada y semana |
+| `listar_clientes` | Clientes, con búsqueda por nombre |
+| `ordenes` | Órdenes con ítems por color y totales, filtrables por cliente y fecha |
+
+Formas de usarlo:
+
+- **Chat del panel:** por defecto se conecta en proceso (sin red ni configuración).
+- **HTTP:** con `MCP_TOKEN`, queda en `https://<tu-backend>/mcp` (Streamable HTTP, sin estado).
+- **stdio**, para clientes locales como Claude Desktop, Claude Code o Cursor, con el mismo `.env`:
+
+  ```json
+  {
+    "mcpServers": {
+      "costureria": {
+        "command": "uv",
+        "args": ["--directory", "/ruta/a/backend", "run", "python", "-m", "mcp_server"]
+      }
+    }
+  }
+  ```
+
+Para agregar una consulta: escribe la función en `mcp_server/consultas.py` y regístrala con
+`@_herramienta(...)` en `mcp_server/servidor.py`. El chat la descubre sola.
 
 ## Reglas de negocio
 

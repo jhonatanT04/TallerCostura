@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -24,6 +25,22 @@ class Settings(BaseSettings):
         "https://taller-costura-gray.vercel.app",
     ]
     docs_enabled: bool = True
+
+    # Asistente del panel. Solo lo configura quien despliega (variables de entorno); la
+    # ADMIN no ve ni cambia nada de esto. Sin la clave del proveedor elegido, el endpoint
+    # del asistente responde 503 y el resto de la API funciona igual.
+    asistente_proveedor: Literal["openai", "gemini", "anthropic"] = "openai"
+    asistente_modelo: str = ""  # vacío → el modelo por defecto del proveedor
+    openai_api_key: str = ""
+    gemini_api_key: str = ""
+    anthropic_api_key: str = ""
+
+    # Servidor MCP (carpeta mcp_server/). Con MCP_TOKEN se publica en /mcp por HTTP para otros
+    # clientes (Claude Desktop, Cursor...); sin él solo lo usa el chat, en proceso.
+    mcp_token: str = ""
+    # Si se define, el chat usa ese servidor MCP remoto en vez del de este proceso.
+    asistente_mcp_url: str = ""
+    asistente_mcp_token: str = ""
 
     @field_validator("jwt_secret_key")
     @classmethod
